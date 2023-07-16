@@ -1,2 +1,2 @@
 # opengl
-使用opengl制作的2d游戏引擎，附用例
+使用opengl制作的2d游戏框架，附用例
