@@ -1,0 +1,5 @@
+# for python
+*.pyc
+temp*
+test*
+data
