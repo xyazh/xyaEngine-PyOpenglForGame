@@ -22,3 +22,4 @@ class RenderGlobal:
 
     def start(self):
         self.dis_shader = ShaderManager.loadShader("./res/shader/dis")
+        self.dis_shader_1 = ShaderManager.loadShader("./res/shader/dis1")
