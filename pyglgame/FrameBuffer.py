@@ -91,7 +91,6 @@ class FrameBuffer:
         """将当前帧缓冲对象解绑"""
         self.unbind()
         size = RenderGlobal.instance.window.size
-        print(size)
         glViewport(0, 0, size.w, size.h)
         glClearColor(0.0, 0.0, 0.0, 1.0)
 

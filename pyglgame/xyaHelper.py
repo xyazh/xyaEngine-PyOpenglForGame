@@ -4,28 +4,31 @@ import re
 import threading
 from PIL import Image
 from io import BytesIO
+from OpenGL.GLUT import glutGet, GLUT_ELAPSED_TIME
 
 import threading
 import time
+
 
 def xyaTimerFunc(t: int, fuc):
     if not hasattr(xyaTimerFunc, 'frist') or xyaTimerFunc.frist:
         t /= 1000
         xyaTimerFunc.frist = False
-        nano_time_start = time.process_time_ns()
+        nano_time_start = glutGet(GLUT_ELAPSED_TIME)
         nano_time_end = nano_time_start
-
+        dt = 0
         def wrapper():
             while True:
-                nonlocal nano_time_start, nano_time_end
-                nano_time_end = time.process_time_ns()
-                dt = nano_time_end - nano_time_start
-                dt /= 1000000000
-                fuc()
-                nano_time_start = time.process_time_ns()
+                nonlocal nano_time_start, nano_time_end, dt
+                nano_time_start = nano_time_end
+                dt /= 1000
+                tps = 1.0 / dt if dt > 0 else 0
+                fuc(dt, tps)
                 sleep_time = t - dt
                 if sleep_time > 0:
                     time.sleep(sleep_time)
+                nano_time_end = glutGet(GLUT_ELAPSED_TIME)
+                dt = nano_time_end - nano_time_start
         threading.Thread(target=wrapper, daemon=True).start()
 
 
@@ -37,12 +40,14 @@ def run_time(fuc):
         return r
     return r_fuc
 
+
 def get_run_time(fuc):
     def r_fuc(*args, **kw):
         t = time.time()
         r = fuc(*args, **kw)
-        return time.time()-t,r
+        return time.time()-t, r
     return r_fuc
+
 
 def timeit(func):
     def wrapper(*args, **kwargs):
@@ -52,8 +57,9 @@ def timeit(func):
         print(f"{func.__name__} took {end - start} seconds to execute.")
         return result
     return wrapper
-    
-def base64_to_image(base64_data)->Image:
+
+
+def base64_to_image(base64_data) -> Image:
     base64_data = re.sub('^data:image/.+;base64,', '', base64_data)
     byte_data = base64.b64decode(base64_data)
     image_data = BytesIO(byte_data)
