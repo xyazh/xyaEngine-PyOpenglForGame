@@ -1,3 +1,4 @@
+import random
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -18,31 +19,31 @@ class GameMainLoop:
         self.render_buffer = RenderBuffer(GL_STREAM_DRAW)
         self.logo_img = Image(ResourceLocation("./res/img/logo.png", True))
         self.test_img = Image(ResourceLocation("./res/img/test.png", True))
+        self.n = 10000
+        self.px = [(random.random()-0.5)*2 for _ in range(self.n)]
+        self.py = [(random.random()-0.5)*2 for _ in range(self.n)]
+        self.pz = [(random.random()-0.5)*10 for _ in range(self.n)]
 
     def start(self):
         window_size = RenderGlobal.instance.window.size
         self.frame_buffer = FrameBuffer(window_size.w, window_size.h)
-        self.test_tex = self.test_img.getTexture()
-        buf_builder = self.render_buffer.createBuffer(
-            GL_TRIANGLES, POS | TEX | COL)
-        buf_builder.pos(-1, -1, 0).tex(0, 0).col(1, 0, 0, 1).end()  # bottom left
-        buf_builder.pos(1, -1, 0).tex(1, 0).col(0, 1, 0, 1).end()   # bottom right
-        buf_builder.pos(-1, 1, 0).tex(0, 1).col(1, 0, 1, 1).end()   # top left
-        buf_builder.pos(1, -1, 0).tex(1, 0).col(0, 1,0, 1).end()   # bottom right
-        buf_builder.pos(1, 1, 0).tex(1, 1).col(0, 0, 1, 1).end()    # top right
-        buf_builder.pos(-1, 1, 0).tex(0, 1).col(1, 0, 1, 1).end()   # top left
 
     def doUpdate(self, dt: float,tps: float):
         pass
 
     def doRender(self, dt: float, fps: float):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        self.test_tex.bind()
-        self.frame_buffer.draw(self.render_buffer.draw)
-        self.frame_buffer.drawToWindow()
+        glEnable(GL_DEPTH_TEST)
+        glDisable(GL_CULL_FACE)
+        glPointSize(5)
+        buf_builder = self.render_buffer.createBuffer(
+            GL_POINTS, POS | COL)
+        for i in range(self.n):
+            buf_builder.pos(self.px[i],self.py[i],self.pz[i]).col(1, 0, 1, 1).end()
+        self.render_buffer.draw()
         glFlush()
 
-    def updateLoop(self,):
+    def updateLoop(self):
         xyaTimerFunc(1, self.doUpdate)
 
     def renderLoop(self, _=None):

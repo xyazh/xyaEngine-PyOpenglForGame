@@ -1,4 +1,7 @@
+import glm
 from OpenGL.GL import *
+from ..Matrix import Matrix
+
 
 class Shader:
     def __init__(self, shader):
@@ -13,9 +16,10 @@ class Shader:
     def getShaderId(self)->int:
         return self.shader
 
-    def sendMatrix4AsUniform(self, name:str, transpose:bool, mat:list):
-        loc = self.getLoc(name)
-        glUniformMatrix4fv(loc, 1, transpose, mat)
+    def uniformMatrix4fv(self, uniform_name:str, matrix:Matrix):
+        loc = self.getLoc(uniform_name)
+        glUniformMatrix4fv(loc, 1, GL_TRUE, matrix.valuePtr())
+        
 
     def boolean1b(self, name:str, b:bool):
         self.uniform1i(name, 1 if b else 0)

@@ -45,12 +45,12 @@ class FrameBuffer:
         self.render_buffer = RenderBuffer(GL_STREAM_DRAW)
         self.buf_builder = self.render_buffer.createBuffer(
             GL_TRIANGLES, POS | TEX)
-        self.buf_builder.pos(-1, -1, 0).tex(0, 1).end()  # bottom left
-        self.buf_builder.pos(1, -1, 0).tex(1, 1).end()   # bottom right
-        self.buf_builder.pos(-1, 1, 0).tex(0, 0).end()   # top left
-        self.buf_builder.pos(1, -1, 0).tex(1, 1).end()   # bottom right
-        self.buf_builder.pos(1, 1, 0).tex(1, 0).end()    # top right
-        self.buf_builder.pos(-1, 1, 0).tex(0, 0).end()   # top left
+        self.buf_builder.pos(-1, -1, 0).tex(0, 0).end()  # bottom left
+        self.buf_builder.pos(1, -1, 0).tex(1, 0).end()   # bottom right
+        self.buf_builder.pos(-1, 1, 0).tex(0, 1).end()   # top left
+        self.buf_builder.pos(1, -1, 0).tex(1, 0).end()   # bottom right
+        self.buf_builder.pos(1, 1, 0).tex(1, 1).end()    # top right
+        self.buf_builder.pos(-1, 1, 0).tex(0, 1).end()   # top left
 
     def __del__(self):
         self.cleanup()
