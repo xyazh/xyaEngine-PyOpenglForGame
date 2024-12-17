@@ -16,11 +16,11 @@ class BaseWindow:
     def __init__(self, app: "App", title: str, size: tuple[float], position: tuple[float], full_screen: bool) -> None:
         self.setWindownSize(size)
         self.app = app
+        self.render_global = RenderGlobal(app, self)
         self.pos_x, self.pos_y = position
         self.full_screen: bool = full_screen
         self.title: str = title
         self.game_loop = GameMainLoop()
-        self.render_global = RenderGlobal(app, self)
 
     def setWindownSize(self, size: tuple[float]) -> None:
         self.size = Size(*size)

@@ -19,27 +19,57 @@ class GameMainLoop:
         self.render_buffer = RenderBuffer(GL_STREAM_DRAW)
         self.logo_img = Image(ResourceLocation("./res/img/logo.png", True))
         self.test_img = Image(ResourceLocation("./res/img/test.png", True))
-        self.n = 10000
-        self.px = [(random.random()-0.5)*2 for _ in range(self.n)]
-        self.py = [(random.random()-0.5)*2 for _ in range(self.n)]
-        self.pz = [(random.random()-0.5)*10 for _ in range(self.n)]
+        self.dz = -0.5
 
     def start(self):
         window_size = RenderGlobal.instance.window.size
         self.frame_buffer = FrameBuffer(window_size.w, window_size.h)
 
     def doUpdate(self, dt: float,tps: float):
+        self.dz -= 0.1 * dt
         pass
 
     def doRender(self, dt: float, fps: float):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glEnable(GL_DEPTH_TEST)
         glDisable(GL_CULL_FACE)
-        glPointSize(5)
         buf_builder = self.render_buffer.createBuffer(
-            GL_POINTS, POS | COL)
-        for i in range(self.n):
-            buf_builder.pos(self.px[i],self.py[i],self.pz[i]).col(1, 0, 1, 1).end()
+            GL_QUADS, POS | COL)
+        buf_builder.pos(0.5, 0.5, 0.5).col(1, 0, 0, 1).end()
+        buf_builder.pos(-0.5, 0.5, 0.5).col(0, 1, 0, 1).end()
+        buf_builder.pos(-0.5, -0.5, 0.5).col(0, 0, 1, 1).end()
+        buf_builder.pos(0.5, -0.5, 0.5).col(1, 1, 0, 1).end()
+
+        # 后面
+        buf_builder.pos(0.5, 0.5, -0.5).col(1, 0, 0, 1).end()
+        buf_builder.pos(0.5, -0.5, -0.5).col(0, 1, 0, 1).end()
+        buf_builder.pos(-0.5, -0.5, -0.5).col(0, 0, 1, 1).end()
+        buf_builder.pos(-0.5, 0.5, -0.5).col(1, 1, 0, 1).end()
+
+        # 左面
+        buf_builder.pos(-0.5, 0.5, 0.5).col(1, 0, 0, 1).end()
+        buf_builder.pos(-0.5, 0.5, -0.5).col(0, 1, 0, 1).end()
+        buf_builder.pos(-0.5, -0.5, -0.5).col(0, 0, 1, 1).end()
+        buf_builder.pos(-0.5, -0.5, 0.5).col(1, 1, 0, 1).end()
+
+        # 右面
+        buf_builder.pos(0.5, 0.5, 0.5).col(1, 0, 0, 1).end()
+        buf_builder.pos(0.5, -0.5, 0.5).col(0, 1, 0, 1).end()
+        buf_builder.pos(0.5, -0.5, -0.5).col(0, 0, 1, 1).end()
+        buf_builder.pos(0.5, 0.5, -0.5).col(1, 1, 0, 1).end()
+
+        # 上面
+        buf_builder.pos(0.5, 0.5, 0.5).col(1, 0, 0, 1).end()
+        buf_builder.pos(0.5, 0.5, -0.5).col(0, 1, 0, 1).end()
+        buf_builder.pos(-0.5, 0.5, -0.5).col(0, 0, 1, 1).end()
+        buf_builder.pos(-0.5, 0.5, 0.5).col(1, 1, 0, 1).end()
+
+        # 下面
+        buf_builder.pos(0.5, -0.5, 0.5).col(1, 0, 0, 1).end()
+        buf_builder.pos(-0.5, -0.5, 0.5).col(0, 1, 0, 1).end()
+        buf_builder.pos(-0.5, -0.5, -0.5).col(0, 0, 1, 1).end()
+        buf_builder.pos(0.5, -0.5, -0.5).col(1, 1, 0, 1).end()
+
         self.render_buffer.draw()
         glFlush()
 

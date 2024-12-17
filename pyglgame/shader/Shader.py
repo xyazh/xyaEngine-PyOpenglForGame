@@ -18,7 +18,7 @@ class Shader:
 
     def uniformMatrix4fv(self, uniform_name:str, matrix:Matrix):
         loc = self.getLoc(uniform_name)
-        glUniformMatrix4fv(loc, 1, GL_TRUE, matrix.valuePtr())
+        glUniformMatrix4fv(loc, 1, GL_FALSE, matrix.valuePtr())
         
 
     def boolean1b(self, name:str, b:bool):

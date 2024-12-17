@@ -13,8 +13,10 @@ layout(location = 3) in vec3 aNormal;    // 法线
 layout(location = 4) in vec2 aLightMap;  // 光照贴图
 
 uniform int formatType;  // 控制布局的类型
+uniform mat4 scale;
+uniform mat4 rotate;
+uniform mat4 translate;
 uniform mat4 projection;
-uniform mat4 view;
 
 out vec4 fragColor;
 out vec2 fragTexCoord;
@@ -33,7 +35,7 @@ void main()
 
     // 根据 formatType 选择性启用属性
     if ((formatType & POS) != 0) {
-        gl_Position = projection * view * vec4(aPos, 1.0);
+        gl_Position = projection * (translate * (rotate * (scale * vec4(aPos, 1.0))));
     }
 
     if ((formatType & COL) != 0) {

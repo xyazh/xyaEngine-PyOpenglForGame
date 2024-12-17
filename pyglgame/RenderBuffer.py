@@ -1,3 +1,4 @@
+import random
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -14,8 +15,14 @@ class RenderBuffer:
         self.usage = usage
         self.buffer_builder = None
         self.is_build = False
-        self.matrix = Matrix()
-        self.view = Matrix()
+        self.size = RenderGlobal.instance.window.size
+        self.projection = Matrix()
+        self.rotate = Matrix()
+        self.translate = Matrix()
+        self.scale = Matrix()
+
+        self.translate.translate(0, 0, -3)
+        self.projection.perspective(45.0, self.size.w / self.size.h, 0.1, 100.0)
 
     def __del__(self):
         if self.vbo == -1:
@@ -40,20 +47,24 @@ class RenderBuffer:
     def draw(self, use_dis_shader: bool = True):
         self.build()
         if use_dis_shader:
-            RenderGlobal.instance.dis_shader.use()
-            size = RenderGlobal.instance.window.size
-            self.matrix.perspective(90.0, size.w / size.h, 0.1, 100.0)
-            RenderGlobal.instance.dis_shader.uniform1i(
-                "formatType", self.buffer_builder.format_type)
-            RenderGlobal.instance.dis_shader.uniformMatrix4fv(
-                "projection", self.matrix)
-            RenderGlobal.instance.dis_shader.uniformMatrix4fv(
-                "view", self.view)
+            dis_shader = RenderGlobal.instance.dis_shader
+            dis_shader.use()
+
+            self.rotate.rotate(0.5, (random.random() for _ in range(3)))
+            self.projection.perspective(45.0, self.size.w / self.size.h, 0.1, 100.0)
+            
+            dis_shader.uniform1i("formatType", self.buffer_builder.format_type)
+            dis_shader.uniformMatrix4fv("scale",self.scale)
+            dis_shader.uniformMatrix4fv("rotate", self.rotate)
+            dis_shader.uniformMatrix4fv("translate", self.translate)
+            dis_shader.uniformMatrix4fv("projection", self.projection)
+
             glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
             self.configureVertexAttributes()
             glDrawArrays(self.buffer_builder.pri_type,
                          0, self.buffer_builder.size)
-            RenderGlobal.instance.dis_shader.release()
+            
+            dis_shader.release()
             return
         glDrawArrays(self.buffer_builder.pri_type, 0, self.buffer_builder.size)
 
