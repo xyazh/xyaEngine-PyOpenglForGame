@@ -22,6 +22,7 @@ class BaseWindow:
         self.title: str = title
         self.game_loop = GameMainLoop()
 
+
     def setWindownSize(self, size: tuple[float]) -> None:
         self.size = Size(*size)
 
@@ -41,8 +42,8 @@ class BaseWindow:
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA |
                             GLUT_DEPTH | GLUT_STENCIL)
         glEnable(GL_TEXTURE_2D)
-        glEnable(GL_BLEND)
         glEnable(GL_DEPTH_TEST)
+        glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glEnable(GL_CULL_FACE)
         glutDisplayFunc(self.displayFunc)
@@ -73,7 +74,7 @@ class BaseWindow:
         return False
 
     def _mouseHit(self, button, state, x, y):
-        pass
+        print(button, state, x, y)
 
     def getMouse(self) -> tuple:
         return (0, 0)

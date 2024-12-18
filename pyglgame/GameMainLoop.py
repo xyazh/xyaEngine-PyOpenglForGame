@@ -25,14 +25,6 @@ class GameMainLoop:
         window_size = RenderGlobal.instance.window.size
         self.frame_buffer = FrameBuffer(window_size.w, window_size.h)
 
-    def doUpdate(self, dt: float,tps: float):
-        self.dz -= 0.1 * dt
-        pass
-
-    def doRender(self, dt: float, fps: float):
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glEnable(GL_DEPTH_TEST)
-        glDisable(GL_CULL_FACE)
         buf_builder = self.render_buffer.createBuffer(
             GL_QUADS, POS | COL)
         buf_builder.pos(0.5, 0.5, 0.5).col(1, 0, 0, 1).end()
@@ -70,20 +62,29 @@ class GameMainLoop:
         buf_builder.pos(-0.5, -0.5, -0.5).col(0, 0, 1, 1).end()
         buf_builder.pos(0.5, -0.5, -0.5).col(1, 1, 0, 1).end()
 
+
+    def doUpdate(self, dt: float,tps: float):
+        self.dz -= 0.1 * dt
+        pass
+
+    def doRender(self, dt: float, fps: float):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glEnable(GL_DEPTH_TEST)
+        glDisable(GL_CULL_FACE)
+        
         self.render_buffer.draw()
-        glFlush()
+        glutSwapBuffers()
 
     def updateLoop(self):
-        xyaTimerFunc(1, self.doUpdate)
+        xyaTimerFunc(1000, self.doUpdate)
 
-    def renderLoop(self, _=None):
+    def renderLoop(self):
         current_time = glutGet(GLUT_ELAPSED_TIME) / 1000.0
         self.render_dt = current_time - self.render_last_time
         self.render_last_time = current_time
         fps = 1.0 / self.render_dt if self.render_dt > 0 else 0
         self.doRender(self.render_dt, fps)
-        glutTimerFunc(1, self.renderLoop, 1)
 
     def run(self):
         self.updateLoop()
-        self.renderLoop()
+        glutIdleFunc(self.renderLoop)
