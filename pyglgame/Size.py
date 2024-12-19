@@ -1,5 +1,6 @@
 class Size:
     def __init__(self, w: float, h: float) -> None:
+        self.change_fuc = []
         self.updateSize(w, h)
 
     def __repr__(self):
@@ -13,3 +14,8 @@ class Size:
         self.h: float = h
         self.x: float = w
         self.y: float = h
+        for fuc in self.change_fuc:
+            fuc(w, h)
+
+    def onChange(self, fuc):
+        self.change_fuc.append(fuc)

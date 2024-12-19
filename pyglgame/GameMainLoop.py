@@ -3,80 +3,35 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from .xyaHelper import *
-from .BufferBuilder import *
-from .RenderBuffer import RenderBuffer
-from .Image import Image
-from .ResourceLocation import ResourceLocation
-from .FrameBuffer import FrameBuffer
 from .RenderGlobal import RenderGlobal
+from .shader.ShaderManager import ShaderManager
 
 
 class GameMainLoop:
     def __init__(self) -> None:
         self.render_last_time = 0
         self.render_dt = 0
-
-        self.render_buffer = RenderBuffer(GL_STREAM_DRAW)
-        self.logo_img = Image(ResourceLocation("./res/img/logo.png", True))
-        self.test_img = Image(ResourceLocation("./res/img/test.png", True))
-        self.dz = -0.5
+        self.render_global = None
 
     def start(self):
-        window_size = RenderGlobal.instance.window.size
-        self.frame_buffer = FrameBuffer(window_size.w, window_size.h)
-
-        buf_builder = self.render_buffer.createBuffer(
-            GL_QUADS, POS | COL)
-        buf_builder.pos(0.5, 0.5, 0.5).col(1, 0, 0, 1).end()
-        buf_builder.pos(-0.5, 0.5, 0.5).col(0, 1, 0, 1).end()
-        buf_builder.pos(-0.5, -0.5, 0.5).col(0, 0, 1, 1).end()
-        buf_builder.pos(0.5, -0.5, 0.5).col(1, 1, 0, 1).end()
-
-        # 后面
-        buf_builder.pos(0.5, 0.5, -0.5).col(1, 0, 0, 1).end()
-        buf_builder.pos(0.5, -0.5, -0.5).col(0, 1, 0, 1).end()
-        buf_builder.pos(-0.5, -0.5, -0.5).col(0, 0, 1, 1).end()
-        buf_builder.pos(-0.5, 0.5, -0.5).col(1, 1, 0, 1).end()
-
-        # 左面
-        buf_builder.pos(-0.5, 0.5, 0.5).col(1, 0, 0, 1).end()
-        buf_builder.pos(-0.5, 0.5, -0.5).col(0, 1, 0, 1).end()
-        buf_builder.pos(-0.5, -0.5, -0.5).col(0, 0, 1, 1).end()
-        buf_builder.pos(-0.5, -0.5, 0.5).col(1, 1, 0, 1).end()
-
-        # 右面
-        buf_builder.pos(0.5, 0.5, 0.5).col(1, 0, 0, 1).end()
-        buf_builder.pos(0.5, -0.5, 0.5).col(0, 1, 0, 1).end()
-        buf_builder.pos(0.5, -0.5, -0.5).col(0, 0, 1, 1).end()
-        buf_builder.pos(0.5, 0.5, -0.5).col(1, 1, 0, 1).end()
-
-        # 上面
-        buf_builder.pos(0.5, 0.5, 0.5).col(1, 0, 0, 1).end()
-        buf_builder.pos(0.5, 0.5, -0.5).col(0, 1, 0, 1).end()
-        buf_builder.pos(-0.5, 0.5, -0.5).col(0, 0, 1, 1).end()
-        buf_builder.pos(-0.5, 0.5, 0.5).col(1, 1, 0, 1).end()
-
-        # 下面
-        buf_builder.pos(0.5, -0.5, 0.5).col(1, 0, 0, 1).end()
-        buf_builder.pos(-0.5, -0.5, 0.5).col(0, 1, 0, 1).end()
-        buf_builder.pos(-0.5, -0.5, -0.5).col(0, 0, 1, 1).end()
-        buf_builder.pos(0.5, -0.5, -0.5).col(1, 1, 0, 1).end()
-
+        self.render_global = RenderGlobal.instance
+        self.render_global.dis_shader = ShaderManager.loadShader("./res/shader/dis")
+        self.render_global.dis_shader_1 = ShaderManager.loadShader("./res/shader/dis1")
+        for game_object in self.render_global.game_objects:
+            game_object.start()
 
     def doUpdate(self, dt: float,tps: float):
-        self.dz -= 0.1 * dt
-        pass
+        for game_object in self.render_global.game_objects:
+            game_object.update(dt, tps)
 
     def doRender(self, dt: float, fps: float):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glEnable(GL_DEPTH_TEST)
-        glDisable(GL_CULL_FACE)
-        
-        self.render_buffer.draw()
+        for game_object in self.render_global.game_objects:
+            game_object.render(dt, fps)
         glutSwapBuffers()
 
     def updateLoop(self):
-        xyaTimerFunc(1000, self.doUpdate)
+        xyaTimerFunc(10, self.doUpdate)
 
     def renderLoop(self):
         current_time = glutGet(GLUT_ELAPSED_TIME) / 1000.0

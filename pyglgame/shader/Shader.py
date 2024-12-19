@@ -1,6 +1,7 @@
 import glm
 from OpenGL.GL import *
 from ..Matrix import Matrix
+from ..RenderGlobal import RenderGlobal
 
 
 class Shader:
@@ -9,9 +10,11 @@ class Shader:
 
     def use(self):
         glUseProgram(self.shader)
+        RenderGlobal.instance.using_shader = self
 
     def release(self):
         glUseProgram(0)
+        RenderGlobal.instance.using_shader = None
 
     def getShaderId(self)->int:
         return self.shader

@@ -27,13 +27,7 @@ class Matrix:
         self.mat = glm.perspective(glm.radians(fov), aspect_ratio, near, far)
         return self
     
-    def lookAt(self, eye:Vec3|tuple|list, center:Vec3|tuple|list, up:Vec3|tuple|list):
-        if isinstance(eye, (list, tuple)):
-            eye = Vec3(*eye)
-        if isinstance(center, (list, tuple)):
-            center = Vec3(*center)
-        if isinstance(up, (list, tuple)):
-            up = Vec3(*up)
+    def lookAt(self, eye:Vec3, center:Vec3, up:Vec3):
         view = glm.lookAt(eye, center, up)
         self.mat = view
     
