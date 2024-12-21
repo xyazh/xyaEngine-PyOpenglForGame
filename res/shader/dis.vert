@@ -33,7 +33,7 @@ void main()
     fragNormal = vec3(0.0, 0.0, 1.0);
     fragLightMap = vec2(1.0);
     fragFormatType = formatType;
-
+    gl_Point
     // 根据 formatType 选择性启用属性
     if ((formatType & POS) != 0) {
         gl_Position = projection * (view * (translate * (rotate * (scale * vec4(aPos, 1.0)))));

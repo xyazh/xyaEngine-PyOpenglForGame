@@ -125,4 +125,4 @@ class CarameData:
         self.view.lookAt(self._pos, self._pos + self._forward, self._up)
 
     def updataProjection(self, w, h):
-        self.projection.perspective(45.0, w / h, 0.1, 100.0)
+        self.projection.perspective(45.0, w / h, 0.1, 1000.0)

@@ -15,7 +15,7 @@ class Carmera(GameObject, CarameData):
     
     def test(self):
         self.translate.translate(0, 0, -3)
-        self.projection.perspective(45.0, 1920 / 1080, 0.1, 100.0)
+        self.projection.perspective(45.0, 1920 / 1080, 0.1, 1000.0)
 
     def use(self):
         shader = RenderGlobal.instance.using_shader

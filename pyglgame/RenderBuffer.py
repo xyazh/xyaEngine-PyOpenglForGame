@@ -26,16 +26,18 @@ class RenderBuffer:
         self.buffer_builder = BufferBuilder(pri_type, format_type)
         return self.buffer_builder
 
-    def build(self):
+    def build(self,re_build:bool=True):
         if self.vbo == -1:
-            glGenBuffers(1)
+            self.vbo = glGenBuffers(1)
+        elif not re_build:
+            return
         vertices = self.buffer_builder.buffer
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         glBufferData(GL_ARRAY_BUFFER, len(vertices) * sizeof(c_float),
                      (c_float * len(vertices))(*vertices), self.usage)
 
-    def draw(self):
-        self.build()
+    def draw(self,re_build:bool=True):
+        self.build(re_build)
         shader = RenderGlobal.instance.using_shader
         if shader is not None:
             shader.uniform1i("formatType", self.buffer_builder.format_type)

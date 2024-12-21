@@ -5,5 +5,5 @@ app = App()
 test_obj = TestGameObject()
 
 
-app.window.setWindownSize((192,108))
+app.window.setWindownSize((1920,1080))
 app.start()
