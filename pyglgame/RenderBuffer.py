@@ -41,7 +41,6 @@ class RenderBuffer:
         shader = RenderGlobal.instance.using_shader
         if shader is not None:
             shader.uniform1i("formatType", self.buffer_builder.format_type)
-        
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         self.configureVertexAttributes()
         glDrawArrays(self.buffer_builder.pri_type,0, self.buffer_builder.size)
@@ -76,3 +75,8 @@ class RenderBuffer:
             glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE,
                                   stride, c_void_p(offset))
             offset += f_size * 2
+        if format_type & SIZ:
+            glEnableVertexAttribArray(5)
+            glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE,
+                                  stride, c_void_p(offset))
+            offset += f_size

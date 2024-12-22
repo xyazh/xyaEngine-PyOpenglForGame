@@ -25,7 +25,7 @@ void main()
 
     if ((fragFormatType & TEX) != 0) {
         vec4 texColor = texture(textureSampler, fragTexCoord);
-        color *= texColor;
+        color = texColor;
     }
 
     FragColor = color;

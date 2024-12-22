@@ -3,6 +3,7 @@ COL = 0b00000010
 TEX = 0b00000100
 NOR = 0b00001000
 LIT = 0b00010000
+SIZ = 0b00100000
 
 
 class BufferBuilder:
@@ -16,6 +17,7 @@ class BufferBuilder:
         self.offset_tex = 0
         self.offset_nor = 0
         self.offset_lit = 0
+        self.offset_siz = 0
         self.initTempBuffer()
         self.size = 0
 
@@ -36,6 +38,9 @@ class BufferBuilder:
         if self.format_type & LIT:
             self.offset_lit = count
             count += 2
+        if self.format_type & SIZ:
+            self.offset_siz = count
+            count += 1
         self.temp_buffer = [0 for _ in range(count)]
 
     def pos(self, x: float | int, y: float | int, z: float | int):
@@ -69,6 +74,11 @@ class BufferBuilder:
         o = self.offset_lit
         self.temp_buffer[o] = u
         self.temp_buffer[o + 1] = v
+        return self
+    
+    def siz(self, s: float | int):
+        o = self.offset_siz
+        self.temp_buffer[o] = s
         return self
 
     def end(self):

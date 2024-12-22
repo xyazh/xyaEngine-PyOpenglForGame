@@ -5,12 +5,14 @@ const int COL = 2;      // 颜色
 const int TEX = 4;      // UV
 const int NOR = 8;      // 法线
 const int LIT = 16;     // 光照贴图
+const int SIZ = 32;     // 点尺寸
 
 layout(location = 0) in vec3 aPos;       // 位置
 layout(location = 1) in vec4 aColor;     // 颜色
 layout(location = 2) in vec2 aTexCoord;  // UV
 layout(location = 3) in vec3 aNormal;    // 法线
 layout(location = 4) in vec2 aLightMap;  // 光照贴图
+layout(location = 5) in float aSize;     // 点尺寸
 
 uniform int formatType;  // 控制布局的类型
 

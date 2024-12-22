@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from .BaseWindow import BaseWindow
     from .GameObject import GameObject
     from .shader.Shader import Shader
+    from .Camera import Carmera
 
 
 class RenderGlobal:
@@ -21,6 +22,7 @@ class RenderGlobal:
             cls.instance.using_shader = None
             cls.instance.dis_shader = None
             cls.instance.dis_shader_1 = None
+            cls.instance.cameras = []
         return cls.instance
 
     def __init__(self, app: "App" = None, window: "BaseWindow" = None) -> None:
@@ -30,6 +32,7 @@ class RenderGlobal:
         self.using_shader: "Shader"
         self.dis_shader: "Shader"
         self.dis_shader_1: "Shader"
+        self.cameras: "list[Carmera]" = []
 
     def start(self):
         pass

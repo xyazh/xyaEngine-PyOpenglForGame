@@ -3,6 +3,7 @@ import math
 from .Matrix import Matrix
 from .Vec3 import Vec3
 
+
 class CarameData:
 
     def __init__(self):
@@ -15,6 +16,9 @@ class CarameData:
         self._forward = Vec3(0, 0, -1)
         self._right = Vec3(1, 0, 0)
         self._up = Vec3(0, 1, 0)
+        self._fov = 45
+        self._near = 0.1
+        self._far = 1000
         self.scale = Matrix()
         self.rotate = Matrix()
         self.translate = Matrix()
@@ -110,6 +114,37 @@ class CarameData:
         self.updateForward()
         self.updateView()
 
+    def positionHeading(self, x=None, y=None, z=None, pitch=None, yaw=None, roll=None):
+        if x is not None:
+            self._pos.x = x
+        if y is not None:
+            self._pos.y = y
+        if z is not None:
+            self._pos.z = z
+        if pitch is not None:
+            self._pitch = pitch
+        if yaw is not None:
+            self._yaw = yaw
+        if roll is not None:
+            self._roll = roll
+        self.updateForward()
+        self.updateView()
+
+    def fovNearFar(self, fov, aspect_ratio, near, far):
+        self._fov = fov
+        self._near = near
+        self._far = far
+        self.projection.perspective(self._fov, aspect_ratio, self._near, self._far)
+
+    def projectionArr(self, aspect_ratio, fov=None, near=None, far=None):
+        if fov is not None:
+            self._fov = fov
+        if near is not None:
+            self._near = near
+        if far is not None:
+            self._far = far
+        self.projection.perspective(self._fov, aspect_ratio, self._near, self._far)
+
     def updateForward(self):
         p = self._pitch
         y = self._yaw
@@ -125,4 +160,4 @@ class CarameData:
         self.view.lookAt(self._pos, self._pos + self._forward, self._up)
 
     def updataProjection(self, w, h):
-        self.projection.perspective(45.0, w / h, 0.1, 1000.0)
+        self.projection.perspective(self._fov, w / h, self._near, self._far)

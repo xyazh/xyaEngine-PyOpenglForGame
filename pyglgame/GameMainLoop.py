@@ -4,6 +4,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from .xyaHelper import *
 from .RenderGlobal import RenderGlobal
+from .IWindowCamera import IWindowCamera
 from .shader.ShaderManager import ShaderManager
 
 
@@ -15,20 +16,39 @@ class GameMainLoop:
 
     def start(self):
         self.render_global = RenderGlobal.instance
+        self.cameras = self.render_global.cameras
         self.game_objects = self.render_global.game_objects
         self.render_global.dis_shader = ShaderManager.loadShader("./res/shader/dis")
         self.render_global.dis_shader_1 = ShaderManager.loadShader("./res/shader/dis1")
         for game_object in self.game_objects:
+            game_object.preSrart()
+        for game_object in self.game_objects:
             game_object.start()
+        for game_object in self.game_objects:
+            game_object.postStart()
+
 
     def doUpdate(self, dt: float,tps: float):
         for game_object in self.game_objects:
             game_object.update(dt, tps)
 
     def doRender(self, dt: float, fps: float):
+        glClearColor(0.5, 0.5, 1.0, 0.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        for game_object in self.game_objects:
-            game_object.render(dt, fps)
+        glDepthMask(GL_TRUE)
+        for camera in self.cameras:
+            camera.use()
+            camera.frame_buffer.drawStart()
+            for game_object in self.game_objects:
+                game_object.render(dt, fps)
+            camera.frame_buffer.drawEnd()
+            camera.release()
+
+        glDepthMask(GL_FALSE)
+        for camera in self.cameras:
+            if isinstance(camera, IWindowCamera):
+                camera.drawToWindow()
+
         glutSwapBuffers()
 
     def updateLoop(self):

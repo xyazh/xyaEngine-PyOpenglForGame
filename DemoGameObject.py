@@ -20,23 +20,16 @@ class TestGameObject(GameObject):
                     if random.randint(0, 100) > 90:
                         DemoBlock(x, y, z)
 
+
+
     def start(self):
         self.render_buffer = RenderBuffer(GL_STREAM_DRAW)
-        buf_builder = self.render_buffer.createBuffer(GL_POINTS, POS | COL)
+        buf_builder = self.render_buffer.createBuffer(
+            GL_QUADS, POS | COL | SIZ)
         for block in DemoBlock.all_blocks:
             block.addSurface(buf_builder)
-        self.camera = Carmera()
-        self.camera.test()
-        self.dz = 0
-        #self.camera.rotate.rotate(90, (-1, 0, 0))
         return super().start()
 
     def render(self, dt: float, fps: float):
-        self.shader.use()
-        self.camera.use()
-        
-        self.camera.position(SIZE_X/2, SIZE_Y/2, self.dz*2)
-        self.dz += dt
         self.render_buffer.draw(False)
-        self.shader.release()
         return super().render(dt, fps)
