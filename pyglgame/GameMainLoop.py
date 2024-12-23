@@ -16,6 +16,7 @@ class GameMainLoop:
 
     def start(self):
         self.render_global = RenderGlobal.instance
+        self.window = self.render_global.window
         self.cameras = self.render_global.cameras
         self.game_objects = self.render_global.game_objects
         self.render_global.dis_shader = ShaderManager.loadShader("./res/shader/dis")
@@ -59,6 +60,8 @@ class GameMainLoop:
         self.render_dt = current_time - self.render_last_time
         self.render_last_time = current_time
         fps = 1.0 / self.render_dt if self.render_dt > 0 else 0
+        self.window.clearMouseHit()
+        self.window.clearKeyDown()
         self.doRender(self.render_dt, fps)
 
     def run(self):

@@ -13,7 +13,7 @@ class CarameData:
         self._pitch: float = 0
         self._yaw: float = 0
         self._pos = Vec3(0, 0, 0)
-        self._forward = Vec3(0, 0, -1)
+        self._forward = Vec3(0, 0, 1)
         self._right = Vec3(1, 0, 0)
         self._up = Vec3(0, 1, 0)
         self._fov = 45
@@ -154,7 +154,6 @@ class CarameData:
             math.cos(math.radians(p)) * math.cos(math.radians(y))
         )
         self._forward = glm.normalize(forward)
-        self._right = glm.normalize(glm.cross(forward, self._up))
 
     def updateView(self):
         self.view.lookAt(self._pos, self._pos + self._forward, self._up)

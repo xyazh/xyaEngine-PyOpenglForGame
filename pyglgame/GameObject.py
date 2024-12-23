@@ -10,6 +10,9 @@ class GameObject:
         pass
 
     def preSrart(self):
+        self.render_global = RenderGlobal.instance
+        self.app = self.render_global.app
+        self.window = self.render_global.window
         pass
 
     def start(self):
