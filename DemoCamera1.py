@@ -1,3 +1,4 @@
+import math
 from pyglgame.Camera import Carmera
 from pyglgame.IWindowCamera import IWindowCamera
 from pyglgame.RenderBuffer import RenderBuffer
@@ -41,17 +42,21 @@ class DemoCamera1(Carmera, IWindowCamera):
     def render(self, dt: float, fps: float):
         self.positionHeading(self.dx, self.dy, self.dz,self.dw,self.dp)
         if self.window.getKey("a"):
-            self.dx += 10 * dt
+            self.dx += 10 * dt * math.cos(math.radians(self.dp))
+            self.dz -= 10 * dt * math.sin(math.radians(self.dp))
         if self.window.getKey("d"):
-            self.dx -= 10 * dt
+            self.dx -= 10 * dt * math.cos(math.radians(self.dp))
+            self.dz += 10 * dt * math.sin(math.radians(self.dp))
         if self.window.getKey("space"):
             self.dy += 10 * dt
         if self.window.getKey("shift"):
             self.dy -= 10 * dt
         if self.window.getKey("w"):
-            self.dz += 10 * dt
+            self.dx += 10 * dt * math.sin(math.radians(self.dp))
+            self.dz += 10 * dt * math.cos(math.radians(self.dp))
         if self.window.getKey("s"):
-            self.dz -= 10 * dt
+            self.dx -= 10 * dt * math.sin(math.radians(self.dp))
+            self.dz -= 10 * dt * math.cos(math.radians(self.dp))
         if self.window.getKey("up"):
             self.dw += 45 * dt
             self.dw = min(self.dw, 89)
