@@ -11,9 +11,19 @@ class Matrix:
         self.mat = glm.translate(self.mat, glm.vec3(x, y, z))
         return self
 
+    def translateV(self, v: Vec3):
+        """应用平移变换"""
+        self.mat = glm.translate(self.mat, v)
+        return self
+
     def scale(self, x, y, z):
         """应用缩放变换"""
         self.mat = glm.scale(self.mat, glm.vec3(x, y, z))
+        return self
+    
+    def scaleV(self, v: Vec3):
+        """应用缩放变换"""
+        self.mat = glm.scale(self.mat, v)
         return self
 
     def rotate(self, angle:float, axis:tuple|list):
@@ -22,12 +32,18 @@ class Matrix:
         self.mat = glm.rotate(self.mat, glm.radians(angle), axis)
         return self
     
-    def perspective(self, fov, aspect_ratio, near, far):
+    def rotateV(self, angle:float, v: Vec3):
+        """应用旋转变换"""
+        self.mat = glm.rotate(self.mat, glm.radians(angle), v)
+        return self
+    
+    def perspective(self, fov:float, aspect_ratio:float, near:float, far:float):
         """应用透视投影变换"""
         self.mat = glm.perspective(glm.radians(fov), aspect_ratio, near, far)
         return self
     
     def lookAt(self, eye:Vec3, center:Vec3, up:Vec3):
+        """应用视角变换"""
         view = glm.lookAt(eye, center, up)
         self.mat = view
     

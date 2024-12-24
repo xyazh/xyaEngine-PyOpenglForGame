@@ -19,6 +19,7 @@ class GameMainLoop:
         self.window = self.render_global.window
         self.cameras = self.render_global.cameras
         self.game_objects = self.render_global.game_objects
+        self.render_game_objects = self.render_global.render_game_objects
         self.render_global.dis_shader = ShaderManager.loadShader("./res/shader/dis")
         self.render_global.dis_shader_1 = ShaderManager.loadShader("./res/shader/dis1")
         for game_object in self.game_objects:
@@ -37,7 +38,20 @@ class GameMainLoop:
         glClearColor(0.5, 0.5, 1.0, 0.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glDepthMask(GL_TRUE)
+
+        for game_object in self.game_objects:
+            game_object.renderTick(dt, fps)
+
         for camera in self.cameras:
+            for game_object in self.render_game_objects:
+                shader = game_object.shader
+                shader.use()
+                self.render_global.useUniform(shader)
+                camera.useUniform(shader)
+                game_object.render(dt, fps)
+                shader.release()
+
+        """for camera in self.cameras:
             camera.use()
             camera.frame_buffer.drawStart()
             for game_object in self.game_objects:
@@ -48,7 +62,7 @@ class GameMainLoop:
         glDepthMask(GL_FALSE)
         for camera in self.cameras:
             if isinstance(camera, IWindowCamera):
-                camera.drawToWindow()
+                camera.drawToWindow()"""
 
         glutSwapBuffers()
 

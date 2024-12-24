@@ -1,61 +1,29 @@
-from .CameraData import CarameData
 from .GameObject import GameObject
 from .RenderGlobal import RenderGlobal
 from .FrameBuffer import FrameBuffer
 from .shader.Shader import Shader
 from .Size import Size
+from .Matrix import Matrix
+from .Vec3 import Vec3
 
 
-class Carmera(GameObject, CarameData):
+class Camera(GameObject):
     def __new__(cls, *args, **kwargs):
         instance = super().__new__(cls)
         RenderGlobal.instance.cameras.append(instance)
         return instance
 
-    def __init__(self,size=None):
-        super().__init__()
-        super().__init_data__()
-        self.shader: Shader = None
-        self.should_update_frame_buffer = False
-        self.size = size
+    def __init__(self,should_render=False):
+        super().__init__(should_render)
+        self.view = Matrix()
+        self.projection = Matrix()
 
-    def preSrart(self):
-        self.window_size = RenderGlobal.instance.window.size
-        self.size.onChange(self.updataProjection)
-        if self.size is None:
-            self.size = self.window_size
-        return super().preSrart()
+    def lookAtV(self, eye:Vec3, center:Vec3, up:Vec3):
+        self.view.lookAt(eye, center, up)
 
-    def start(self):
-        self.frame_buffer = FrameBuffer(self.size.x, self.size.y, True)
-        self.window_size.onChange(self.changeSize)
-        return super().start()
-    
-    def changeSize(self, w, h):
-        pass
+    def lookAt(self, eye:tuple|list, center:tuple|list, up:tuple|list):
+        self.lookAtV(Vec3(*eye), Vec3(*center), Vec3(*up))
 
-    def updateFarmeBuffer(self):
-        self.frame_buffer = FrameBuffer(self.size.x, self.size.y, True)
-
-    def test(self):
-        self.updataProjection(self.size.x, self.size.y)
-
-    def drawToWindow(self):
-        self.frame_buffer.drawToWindow()
-
-    def use(self):
-        if self.shader is None:
-            self.shader = RenderGlobal.instance.dis_shader
-        shader = self.shader
-        shader.use()
-        shader.uniformMatrix4fv("scale", self.scale)
-        shader.uniformMatrix4fv("rotate", self.rotate)
-        shader.uniformMatrix4fv("translate", self.translate)
+    def useUniform(self, shader:Shader):
         shader.uniformMatrix4fv("view", self.view)
         shader.uniformMatrix4fv("projection", self.projection)
-
-    def release(self):
-        if self.shader is None:
-            self.shader = RenderGlobal.instance.dis_shader
-        shader = self.shader
-        shader.release()

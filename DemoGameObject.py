@@ -1,7 +1,7 @@
 import random
 from pyglgame.GameObject import GameObject
 from pyglgame.RenderBuffer import RenderBuffer
-from pyglgame.Camera import Carmera
+from pyglgame.Camera import Camera
 from pyglgame.BufferBuilder import *
 from OpenGL.GL import *
 from DemoBlock import DemoBlock, SIZE_X, SIZE_Y, SIZE_Z
