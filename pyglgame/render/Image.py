@@ -1,6 +1,6 @@
 import numpy as np
 from PIL import Image as PILImage
-from .ResourceLocation import ResourceLocation
+from ..ResourceLocation import ResourceLocation
 from .Texture import Texture
 
 class Image:

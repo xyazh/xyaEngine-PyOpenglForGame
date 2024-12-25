@@ -1,14 +1,16 @@
 import random
-from pyglgame.GameObject import GameObject
-from pyglgame.RenderBuffer import RenderBuffer
-from pyglgame.Camera import Camera
-from pyglgame.BufferBuilder import *
+from pyglgame.gameobject.GameObject import GameObject
+from pyglgame.render.RenderBuffer import RenderBuffer
+from pyglgame.gameobject.Camera import Camera
+from pyglgame.render.BufferBuilder import *
 from OpenGL.GL import *
 from DemoBlock import DemoBlock, SIZE_X, SIZE_Y, SIZE_Z
 
 
 class TestGameObject(GameObject):
     def __init__(self):
+        self.f = 0
+        self.df = 0.001
         super().__init__()
         bloch_height_map = [
             [random.randint(0, SIZE_Y-1) for _2 in range(SIZE_Z)] for _1 in range(SIZE_X)]

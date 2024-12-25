@@ -1,4 +1,4 @@
-from pyglgame.BufferBuilder import *
+from pyglgame.render.BufferBuilder import *
 
 SIZE_X = 8
 SIZE_Y = 1

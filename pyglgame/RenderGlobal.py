@@ -1,12 +1,13 @@
 from typing import TYPE_CHECKING
-from .Matrix import Matrix
-from .Vec3 import Vec3
+from .math.Matrix import Matrix
+from .math.Vec3 import Vec3
+from .math.Color import Color
 if TYPE_CHECKING:
     from .App import App
     from .BaseWindow import BaseWindow
-    from .GameObject import GameObject
+    from .gameobject.GameObject import GameObject
     from .shader.Shader import Shader
-    from .Camera import Camera
+    from .gameobject.Camera import Camera
 
 
 class RenderGlobal:
@@ -30,6 +31,8 @@ class RenderGlobal:
         self.dis_shader: "Shader" = None
         self.dis_shader_1: "Shader" = None
         self.cameras: "list[Camera]" = []
+
+        self.bg_color:Color = Color(0.0, 0.0, 0.0)
 
         self.m_scale: Matrix = Matrix()
         self.m_rotate: Matrix = Matrix()

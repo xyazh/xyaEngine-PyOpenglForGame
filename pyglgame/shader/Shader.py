@@ -1,12 +1,12 @@
 import glm
 from OpenGL.GL import *
-from ..Matrix import Matrix
+from ..math.Matrix import Matrix
 from ..RenderGlobal import RenderGlobal
 
 
 class Shader:
-    def __init__(self, shader):
-        self.shader = shader
+    def __init__(self, shader:int):
+        self.shader:int = shader
 
     def use(self):
         glUseProgram(self.shader)

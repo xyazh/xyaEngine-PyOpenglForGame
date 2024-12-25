@@ -4,7 +4,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from .xyaHelper import *
 from .RenderGlobal import RenderGlobal
-from .IWindowCamera import IWindowCamera
+from .gameobject.i.IWindowCamera import IWindowCamera
 from .shader.ShaderManager import ShaderManager
 
 
@@ -35,14 +35,16 @@ class GameMainLoop:
             game_object.update(dt, tps)
 
     def doRender(self, dt: float, fps: float):
-        glClearColor(0.5, 0.5, 1.0, 0.0)
+        glClearColor(*self.render_global.bg_color)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glDepthMask(GL_TRUE)
-
+        
         for game_object in self.game_objects:
             game_object.renderTick(dt, fps)
-
+            
+        glDepthMask(GL_TRUE)
+        glEnable(GL_DEPTH_TEST)
         for camera in self.cameras:
+            camera.renderStart()
             for game_object in self.render_game_objects:
                 shader = game_object.shader
                 shader.use()
@@ -50,6 +52,7 @@ class GameMainLoop:
                 camera.useUniform(shader)
                 game_object.render(dt, fps)
                 shader.release()
+            camera.renderEnd()
 
         """for camera in self.cameras:
             camera.use()
@@ -57,12 +60,13 @@ class GameMainLoop:
             for game_object in self.game_objects:
                 game_object.render(dt, fps)
             camera.frame_buffer.drawEnd()
-            camera.release()
+            camera.release()"""
 
         glDepthMask(GL_FALSE)
+        glDisable(GL_DEPTH_TEST)
         for camera in self.cameras:
             if isinstance(camera, IWindowCamera):
-                camera.drawToWindow()"""
+                camera.drawToWindow()
 
         glutSwapBuffers()
 

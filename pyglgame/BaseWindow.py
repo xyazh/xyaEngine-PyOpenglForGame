@@ -5,7 +5,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from .GameMainLoop import GameMainLoop
-from .Size import Size
+from .math.Size import Size
 from .RenderGlobal import RenderGlobal
 
 if TYPE_CHECKING:

@@ -1,4 +1,4 @@
-from .RenderGlobal import RenderGlobal
+from ..RenderGlobal import RenderGlobal
 
 class GameObject:
     @property

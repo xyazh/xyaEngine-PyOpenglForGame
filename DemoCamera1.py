@@ -1,8 +1,8 @@
 import math
-from pyglgame.Camera import Camera
-from pyglgame.IWindowCamera import IWindowCamera
-from pyglgame.RenderBuffer import RenderBuffer
-from pyglgame.BufferBuilder import *
+from pyglgame.gameobject.Camera import Camera
+from pyglgame.gameobject.i.IWindowCamera import IWindowCamera
+from pyglgame.render.RenderBuffer import RenderBuffer
+from pyglgame.render.BufferBuilder import *
 from OpenGL.GL import *
 from DemoBlock import DemoBlock, SIZE_X, SIZE_Y, SIZE_Z
 

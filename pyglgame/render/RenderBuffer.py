@@ -4,7 +4,7 @@ from OpenGL.GLUT import *
 from pyglgame.xyaHelper import *
 from ctypes import sizeof, c_float, c_void_p
 from .BufferBuilder import *
-from .RenderGlobal import RenderGlobal
+from ..RenderGlobal import RenderGlobal
 
 
 class RenderBuffer:

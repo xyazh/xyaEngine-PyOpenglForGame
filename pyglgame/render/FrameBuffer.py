@@ -1,10 +1,10 @@
 from OpenGL.GL import *
-from .RenderGlobal import RenderGlobal
+from ..RenderGlobal import RenderGlobal
 from .RenderBuffer import *
 
 
 class FrameBuffer:
-    def __init__(self, width: int, height: int, use_depth=False):
+    def __init__(self, width: int, height: int, use_depth=False,param:int = GL_NEAREST):
         self.width = width
         self.height = height
         self.size = RenderGlobal.instance.window.size
@@ -19,8 +19,8 @@ class FrameBuffer:
         glBindTexture(GL_TEXTURE_2D, self.texture_id)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
                      0, GL_RGBA, GL_UNSIGNED_BYTE, None)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, param)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param)
         glFramebufferTexture2D(
             GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.texture_id, 0)
 

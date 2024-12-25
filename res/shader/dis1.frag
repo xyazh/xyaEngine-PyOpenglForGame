@@ -3,13 +3,9 @@
 const int POS = 1;
 const int COL = 2;
 const int TEX = 4;
-const int NOR = 8;
-const int LIT = 16;
 
 in vec4 fragColor;
 in vec2 fragTexCoord;
-in vec3 fragNormal;
-in vec2 fragLightMap;
 flat in int fragFormatType;
 
 out vec4 FragColor;
