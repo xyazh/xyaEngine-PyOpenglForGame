@@ -37,8 +37,6 @@ class RenderGlobal:
         self.m_scale: Matrix = Matrix()
         self.m_rotate: Matrix = Matrix()
         self.m_translate: Matrix = Matrix()
-        
-        self.m_rotate.rotate(180, (0, 1, 0))
 
     def __init__(self, app: "App" = None, window: "BaseWindow" = None) -> None:
         pass

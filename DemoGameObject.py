@@ -30,8 +30,9 @@ class TestGameObject(GameObject):
             GL_QUADS, POS | COL | SIZ)
         for block in DemoBlock.all_blocks:
             block.addSurface(buf_builder)
+        self.render_global.translate(0, 0, -100)
         return super().start()
 
     def render(self, dt: float, fps: float):
-        self.render_buffer.draw(False)
+        self.render_buffer.draw(False) 
         return super().render(dt, fps)
