@@ -50,6 +50,7 @@ class BaseWindow:
         glDepthMask(GL_TRUE)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glEnable(GL_CULL_FACE)
+        glEnable(GL_MULTISAMPLE)
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE)
         glutDisplayFunc(self.displayFunc)
         keyboard.hook(self._keyHook)
@@ -88,7 +89,7 @@ class BaseWindow:
         return key in self.key_down_set
 
     def _mouseHit(self, button, state, x, y):
-        self.on_mouse_x,self.on_mouse_y = x,-y
+        self.on_mouse_x,self.on_mouse_y = x,y
         if button == 0:
             if state == 0:
                 self.mouse_left_on_hit = True
@@ -111,10 +112,10 @@ class BaseWindow:
                 self.mouse_right_button_on = False
             return
     def _onMouseMove(self,x,y):
-        self.on_mouse_x,self.on_mouse_y = x,-y
+        self.on_mouse_x,self.on_mouse_y = x,y
 
     def _mouseMove(self,x,y):
-        self.mouse_x,self.mouse_y = x,-y
+        self.mouse_x,self.mouse_y = x,y
 
     def initMouse(self) -> None:
         self.mouse_left_button_on = False

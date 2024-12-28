@@ -1,8 +1,8 @@
 from pyglgame.render.BufferBuilder import *
 
-SIZE_X = 8
+SIZE_X = 512
 SIZE_Y = 1
-SIZE_Z = 16384
+SIZE_Z = 512
 
 POINT_SIZE = 100
 

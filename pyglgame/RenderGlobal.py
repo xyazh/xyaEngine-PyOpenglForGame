@@ -30,9 +30,10 @@ class RenderGlobal:
         self.using_shader: "Shader" = None
         self.dis_shader: "Shader" = None
         self.dis_shader_1: "Shader" = None
+        self.click_checker_shader: "Shader" = None
         self.cameras: "list[Camera]" = []
 
-        self.bg_color:Color = Color(0.0, 0.0, 0.0)
+        self.bg_color: Color = Color(0.0, 0.0, 0.0, 0.0)
 
         self.m_scale: Matrix = Matrix()
         self.m_rotate: Matrix = Matrix()

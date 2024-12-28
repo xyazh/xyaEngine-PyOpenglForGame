@@ -31,14 +31,13 @@ class Camera(GameObject):
         self.projection = Matrix()
         self._auto_size = auto_size
         self.size = size
-        
-    def autoSize(self, w, h):
-        self.size.updateSize(w, h)
         self._eye = Vec3(0, 0, 0)
         self._center = Vec3(0, 0,-1)
         self._up = Vec3(0, 1, 0)
-        self.view.lookAt(self._eye, self._center, self._up)
 
+        
+    def autoSize(self, w, h):
+        self.size.updateSize(w, h)
     def creatFrameBuffer(self):
         return FrameBuffer(
             self.size.w, self.size.h, use_depth=True, param=GL_LINEAR)

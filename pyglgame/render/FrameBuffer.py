@@ -17,8 +17,8 @@ class FrameBuffer:
         # 创建颜色纹理附件
         self.texture_id = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, self.texture_id)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
-                     0, GL_RGBA, GL_UNSIGNED_BYTE, None)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height,
+                     0, GL_RGBA, GL_FLOAT, None)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, param)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param)
         glFramebufferTexture2D(

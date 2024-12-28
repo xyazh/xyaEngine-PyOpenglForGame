@@ -43,5 +43,9 @@ class Shader:
         loc = self.getLoc(name)
         glUniform3f(loc, f, g, h)
 
+    def uniform4f(self, name:str, f:float, g:float, h:float, i:float):
+        loc = self.getLoc(name)
+        glUniform4f(loc, f, g, h, i)
+
     def getLoc(self, name:str):
         return glGetUniformLocation(self.getShaderId(), name)

@@ -1,10 +1,11 @@
-import random
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from .xyaHelper import *
 from .RenderGlobal import RenderGlobal
 from .gameobject.i.IWindowCamera import IWindowCamera
+from .gameobject.i.IClicker import IClicker
+from .gameobject.Camera import Camera
 from .shader.ShaderManager import ShaderManager
 
 
@@ -22,12 +23,18 @@ class GameMainLoop:
         self.render_game_objects = self.render_global.render_game_objects
         self.render_global.dis_shader = ShaderManager.loadShader("./res/shader/dis")
         self.render_global.dis_shader_1 = ShaderManager.loadShader("./res/shader/dis1")
+        self.render_global.click_checker_shader = ShaderManager.loadShader("./res/shader/click_check")
         for game_object in self.game_objects:
             game_object.preSrart()
         for game_object in self.game_objects:
             game_object.start()
         for game_object in self.game_objects:
             game_object.postStart()
+
+        for camera in self.cameras:
+            camera:Camera|IClicker
+            if isinstance(camera, IClicker):
+                camera.__init_clicker__()
 
 
     def doUpdate(self, dt: float,tps: float):
@@ -44,6 +51,7 @@ class GameMainLoop:
         glDepthMask(GL_TRUE)
         glEnable(GL_DEPTH_TEST)
         for camera in self.cameras:
+            camera:Camera|IClicker
             camera.renderStart()
             for game_object in self.render_game_objects:
                 shader = game_object.shader
@@ -53,14 +61,20 @@ class GameMainLoop:
                 game_object.render(dt, fps)
                 shader.release()
             camera.renderEnd()
-
-        """for camera in self.cameras:
-            camera.use()
-            camera.frame_buffer.drawStart()
-            for game_object in self.game_objects:
-                game_object.render(dt, fps)
-            camera.frame_buffer.drawEnd()
-            camera.release()"""
+            if isinstance(camera,IClicker):
+                camera.renderClickerStart()
+                for game_object in self.render_game_objects:
+                    if not game_object.clickable:
+                        continue
+                    shader = self.render_global.click_checker_shader
+                    shader.use()
+                    self.render_global.useUniform(shader)
+                    camera.useUniform(shader)
+                    camera.setDataColorUniform(shader, *game_object.data_color)
+                    game_object.render(dt, fps)
+                    shader.release()
+                camera.renderClickerEnd()
+            
 
         glDepthMask(GL_FALSE)
         glDisable(GL_DEPTH_TEST)

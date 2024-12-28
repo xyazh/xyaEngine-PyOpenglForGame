@@ -7,20 +7,19 @@ from OpenGL.GL import *
 from DemoBlock import DemoBlock, SIZE_X, SIZE_Y, SIZE_Z
 
 
-class TestGameObject(GameObject):
+class DemoGameObject(GameObject):
     def __init__(self):
         self.f = 0
         self.df = 0.001
         super().__init__()
+        self.clickable: bool = True
+        self.data_color = (0, 0, 12, 1)
         bloch_height_map = [
             [random.randint(0, SIZE_Y-1) for _2 in range(SIZE_Z)] for _1 in range(SIZE_X)]
         for x in range(SIZE_X):
             for z in range(SIZE_Z):
                 for y in range(SIZE_Y):
-                    """if bloch_height_map[x][z] > y:
-                        DemoBlock(x, y, z)"""
-                    if random.randint(0, 100) > 90:
-                        DemoBlock(x, y, z)
+                    DemoBlock(x, y, z)
 
 
 
@@ -30,7 +29,7 @@ class TestGameObject(GameObject):
             GL_QUADS, POS | COL | SIZ)
         for block in DemoBlock.all_blocks:
             block.addSurface(buf_builder)
-        self.render_global.translate(0, 0, -100)
+        self.render_global.translate(0, -3, -100)
         return super().start()
 
     def render(self, dt: float, fps: float):

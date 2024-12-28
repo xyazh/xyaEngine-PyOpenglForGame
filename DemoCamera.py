@@ -1,14 +1,13 @@
 import math
 from pyglgame.gameobject.Camera3D import Camera3D
 from pyglgame.gameobject.i.IWindowCamera import IWindowCamera
-from pyglgame.render.RenderBuffer import RenderBuffer
 from pyglgame.render.BufferBuilder import *
-from pyglgame.math.Size import Size
+from pyglgame.math.Matrix import Matrix
 from OpenGL.GL import *
-from DemoBlock import DemoBlock, SIZE_X, SIZE_Y, SIZE_Z
+from pyglgame.gameobject.i.IClicker import IClicker
 
 
-class DemoCamera(Camera3D, IWindowCamera):
+class DemoCamera(Camera3D, IWindowCamera, IClicker):
     def __init__(self):
         super().__init__(90, 0.1, 10000, auto_aspect=True, auto_size=True)
         self.dx = 0
@@ -16,11 +15,21 @@ class DemoCamera(Camera3D, IWindowCamera):
         self.dz = 0
         self.dw = 0
         self.dp = 0
-        self.t_fov = 10
 
     def postStart(self):
+        
         return super().postStart()
-    
+    def getPixelColor(self,x, y):
+        return super().getPixelColor(x, y)
+
+    def renderEnd(self):
+        mos = self.window.getMouse()
+        print(self.getPixelColor(*mos))
+        return super().renderEnd()
+    def creatFrameBuffer(self):
+        return super().creatFrameBuffer()
+        #return FrameBufferMSAA(self.size.w, self.size.h, use_depth=True, param=GL_LINEAR)
+
     def keyBind(self, dt: float):
         if self.window.getKey("a"):
             self.dx += 10 * dt * math.cos(math.radians(self.dp))
@@ -53,3 +62,6 @@ class DemoCamera(Camera3D, IWindowCamera):
         self.positionAndPitchYaw(self.dx, self.dy, self.dz, self.dw, self.dp)
         self.keyBind(dt)
         return super().renderTick(dt, fps)
+
+    def drawToWindow(self):
+        super().drawToWindow()
