@@ -8,7 +8,7 @@ from pyglgame.render.FrameBufferFake import FrameBufferFake
 from OpenGL.GL import *
 
 
-class DemoCamera1(Camera, IWindowCamera):
+class DemoCamera1(Camera, IWindowCamera, IClicker):
     def __init__(self):
         super().__init__(auto_size=True)
 
@@ -17,7 +17,7 @@ class DemoCamera1(Camera, IWindowCamera):
 
     def creatFrameBuffer(self):
         return super().creatFrameBuffer()
-        #return FrameBufferFake(self.size.w, self.size.h)
+        # return FrameBufferFake(self.size.w, self.size.h)
 
     def renderEnd(self):
         return super().renderEnd()

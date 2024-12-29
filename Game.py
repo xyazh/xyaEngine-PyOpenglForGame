@@ -15,5 +15,5 @@ test_camera = DemoCamera1()
 test_obj = DemoGameObject1()
 
 
-app.window.setWindownSize((1920, 1080))
+app.window.setWindownSize((960, 540))
 app.start()

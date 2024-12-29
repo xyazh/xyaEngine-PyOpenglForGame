@@ -1,7 +1,9 @@
 #version 330 core
 
-const int POS = 1;      // 位置
-const int SIZ = 32;     // 点尺寸
+const int POS = 1;
+const int COL = 2;
+const int TEX = 4;
+const int SIZ = 32;
 
 layout(location = 0) in vec3 aPos;       // 位置
 layout(location = 1) in vec4 aColor;     // 颜色
@@ -17,6 +19,9 @@ uniform mat4 translate;
 uniform mat4 view;
 uniform mat4 projection;
 
+out vec2 fragTexCoord;
+flat out int fragFormatType;
+
 
 void main()
 {
@@ -27,4 +32,9 @@ void main()
     if ((formatType & SIZ) != 0) {
         gl_PointSize = aSize / gl_Position.z;
     }
+
+    if ((formatType & TEX) != 0) {
+        fragTexCoord = aTexCoord;
+    }
+    fragFormatType = formatType;
 }
