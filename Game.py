@@ -7,8 +7,8 @@ app = App()
 
 
 
-#test_camera = DemoCamera()
-#test_obj = DemoGameObject()
+"""test_camera = DemoCamera()
+test_obj = DemoGameObject()"""
 
 
 test_camera = DemoCamera1()

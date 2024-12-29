@@ -23,5 +23,6 @@ class DemoGameObject1(GameObject, IClickable):
         buf.pos(-0.5, -0.5, 0).col(0.3, 0, 0, 1).end()
 
     def render(self, dt: float, fps: float):
+        glDisable(GL_CULL_FACE)
         self.render_buf.draw(False)
         return super().render(dt, fps)

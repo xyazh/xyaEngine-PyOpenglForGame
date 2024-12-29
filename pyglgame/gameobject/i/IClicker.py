@@ -4,8 +4,10 @@ from ...render.BufferBuilder import *
 from OpenGL.GL import *
 from ...math.Size import Size
 from ...gameobject.i.IClickable import IClickable
+from ...render.FrameBuffer import FrameBuffer
+from ...render.FrameBufferFake import FrameBufferFake
 if TYPE_CHECKING:
-    from ...render.FrameBuffer import FrameBuffer
+
     from ...shader.Shader import Shader
     from ...BaseWindow import BaseWindow
     from ...gameobject.GameObject import GameObject
@@ -17,6 +19,12 @@ class IClicker:
 
     def __init_clicker__(self):
         self.clicker_frame_buffer = self.creatFrameBuffer()
+        if isinstance(self.clicker_frame_buffer,FrameBufferFake):
+            self.clicker_frame_buffer = self.disCreatFrameBuffer()
+
+    def disCreatFrameBuffer(self) -> "FrameBuffer":
+        return FrameBuffer(
+            self.size.w, self.size.h, use_depth=True, param=GL_LINEAR)
 
     def hoverMouse(self, objects: "set[GameObject]") -> "tuple[tuple,np.ndarray,Generator[GameObject|IClickable]]":
         mos = self.window.getMouse()

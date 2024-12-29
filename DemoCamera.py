@@ -2,10 +2,11 @@ import math
 from pyglgame.gameobject.Camera3D import Camera3D
 from pyglgame.gameobject.i.IWindowCamera import IWindowCamera
 from pyglgame.render.BufferBuilder import *
+from pyglgame.render.FrameBufferFake import FrameBufferFake
 from OpenGL.GL import *
 from pyglgame.gameobject.i.IClicker import IClicker
 
-class DemoCamera(Camera3D, IWindowCamera, IClicker):
+class DemoCamera(Camera3D, IWindowCamera):
     def __init__(self):
         super().__init__(90, 0.1, 10000, auto_aspect=True, auto_size=True)
         self.dx = 0
@@ -18,18 +19,15 @@ class DemoCamera(Camera3D, IWindowCamera, IClicker):
         return 1
 
     def postStart(self):
-        
         return super().postStart()
-    def getPixelColor(self,x, y):
-        return super().getPixelColor(x, y)
 
     def renderEnd(self):
         mos = self.window.getMouse()
         #print(self.getPixelColor(*mos))
         return super().renderEnd()
     def creatFrameBuffer(self):
-        return super().creatFrameBuffer()
-        #return FrameBufferMSAA(self.size.w, self.size.h, use_depth=True, param=GL_LINEAR)
+        #return super().creatFrameBuffer()
+        return FrameBufferFake(self.size.w, self.size.h)
 
     def keyBind(self, dt: float):
         if self.window.getKey("a"):
