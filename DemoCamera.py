@@ -2,10 +2,8 @@ import math
 from pyglgame.gameobject.Camera3D import Camera3D
 from pyglgame.gameobject.i.IWindowCamera import IWindowCamera
 from pyglgame.render.BufferBuilder import *
-from pyglgame.math.Matrix import Matrix
 from OpenGL.GL import *
 from pyglgame.gameobject.i.IClicker import IClicker
-
 
 class DemoCamera(Camera3D, IWindowCamera, IClicker):
     def __init__(self):
@@ -16,6 +14,9 @@ class DemoCamera(Camera3D, IWindowCamera, IClicker):
         self.dw = 0
         self.dp = 0
 
+    def getLayer(self):
+        return 1
+
     def postStart(self):
         
         return super().postStart()
@@ -24,7 +25,7 @@ class DemoCamera(Camera3D, IWindowCamera, IClicker):
 
     def renderEnd(self):
         mos = self.window.getMouse()
-        print(self.getPixelColor(*mos))
+        #print(self.getPixelColor(*mos))
         return super().renderEnd()
     def creatFrameBuffer(self):
         return super().creatFrameBuffer()

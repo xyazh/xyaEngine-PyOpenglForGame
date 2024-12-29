@@ -18,9 +18,8 @@ class GameMainLoop:
     def start(self):
         self.render_global = RenderGlobal.instance
         self.window = self.render_global.window
-        self.cameras = self.render_global.cameras
         self.game_objects = self.render_global.game_objects
-        self.render_game_objects = self.render_global.render_game_objects
+        self.render_layer = self.render_global.render_layer
         self.render_global.dis_shader = ShaderManager.loadShader("./res/shader/dis")
         self.render_global.dis_shader_1 = ShaderManager.loadShader("./res/shader/dis1")
         self.render_global.click_checker_shader = ShaderManager.loadShader("./res/shader/click_check")
@@ -31,10 +30,12 @@ class GameMainLoop:
         for game_object in self.game_objects:
             game_object.postStart()
 
-        for camera in self.cameras:
-            camera:Camera|IClicker
-            if isinstance(camera, IClicker):
-                camera.__init_clicker__()
+        for layer in self.render_layer.layers.values():
+            cameras = layer.render_cameras
+            for camera in cameras:
+                camera:Camera|IClicker
+                if isinstance(camera, IClicker):
+                    camera.__init_clicker__()
 
 
     def doUpdate(self, dt: float,tps: float):
@@ -50,37 +51,43 @@ class GameMainLoop:
             
         glDepthMask(GL_TRUE)
         glEnable(GL_DEPTH_TEST)
-        for camera in self.cameras:
-            camera:Camera|IClicker
-            camera.renderStart()
-            for game_object in self.render_game_objects:
-                shader = game_object.shader
-                shader.use()
-                self.render_global.useUniform(shader)
-                camera.useUniform(shader)
-                game_object.render(dt, fps)
-                shader.release()
-            camera.renderEnd()
-            if isinstance(camera,IClicker):
-                camera.renderClickerStart()
-                for game_object in self.render_game_objects:
-                    if not game_object.clickable:
-                        continue
-                    shader = self.render_global.click_checker_shader
+        for layer in self.render_layer.layers.values():
+            cameras = layer.render_cameras
+            render_game_objects = layer.render_game_objects
+            for camera in cameras:
+                camera:Camera|IClicker
+                camera.renderStart()
+                for game_object in render_game_objects:
+                    shader = game_object.shader
                     shader.use()
                     self.render_global.useUniform(shader)
                     camera.useUniform(shader)
-                    camera.setDataColorUniform(shader, *game_object.data_color)
                     game_object.render(dt, fps)
                     shader.release()
-                camera.renderClickerEnd()
+                camera.renderEnd()
+                if isinstance(camera,IClicker):
+                    camera.renderClickerStart()
+                    for game_object in render_game_objects:
+                        if not game_object.clickable:
+                            continue
+                        shader = self.render_global.click_checker_shader
+                        shader.use()
+                        self.render_global.useUniform(shader)
+                        camera.useUniform(shader)
+                        camera.setDataColorUniform(shader, *game_object.data_color)
+                        game_object.render(dt, fps)
+                        shader.release()
+                    camera.renderClickerEnd()
+                    camera.onHoverMouse(render_game_objects)
             
 
         glDepthMask(GL_FALSE)
         glDisable(GL_DEPTH_TEST)
-        for camera in self.cameras:
-            if isinstance(camera, IWindowCamera):
-                camera.drawToWindow()
+        for layer in self.render_layer.layers.values():
+            cameras = layer.render_cameras
+            for camera in cameras:
+                if isinstance(camera, IWindowCamera):
+                    camera.drawToWindow()
 
         glutSwapBuffers()
 

@@ -12,7 +12,7 @@ from ..math.Vec3 import Vec3
 class Camera(GameObject):
     def __new__(cls, *args, **kwargs):
         instance = super().__new__(cls)
-        RenderGlobal.instance.cameras.append(instance)
+        RenderGlobal.instance.render_layer.appendCamera(instance)
         return instance
 
     def preSrart(self):
@@ -23,21 +23,20 @@ class Camera(GameObject):
             self.window.size.onChange(self.autoSize)
 
         self.framebuffer = self.creatFrameBuffer()
-        
 
     def __init__(self, size: Size = None, auto_size: bool = False, should_render=False):
-        super().__init__(should_render)
+        super().__init__(should_render=should_render)
         self.view = Matrix()
         self.projection = Matrix()
         self._auto_size = auto_size
         self.size = size
         self._eye = Vec3(0, 0, 0)
-        self._center = Vec3(0, 0,-1)
+        self._center = Vec3(0, 0, -1)
         self._up = Vec3(0, 1, 0)
 
-        
     def autoSize(self, w, h):
         self.size.updateSize(w, h)
+
     def creatFrameBuffer(self):
         return FrameBuffer(
             self.size.w, self.size.h, use_depth=True, param=GL_LINEAR)
@@ -51,7 +50,7 @@ class Camera(GameObject):
     def lookAt(self, eye: tuple | list, center: tuple | list, up: tuple | list):
         self.lookAtV(Vec3(*eye), Vec3(*center), Vec3(*up))
 
-    def _position(self, x:float, y:float, z:float):
+    def _position(self, x: float, y: float, z: float):
         dv = self._center - self._eye
         self._eye.x = x
         self._eye.y = y
@@ -73,11 +72,11 @@ class Camera(GameObject):
         self._pitchYaw(pitch, yaw)
         self.view.lookAt(self._eye, self._center, self._up)
 
-    def position(self,x,y,z):
+    def position(self, x, y, z):
         self._position(x, y, z)
         self.view.lookAt(self._eye, self._center, self._up)
 
-    def pitchYaw(self,pitch:float,yaw:float):
+    def pitchYaw(self, pitch: float, yaw: float):
         self._pitchYaw(pitch, yaw)
         self.view.lookAt(self._eye, self._center, self._up)
 

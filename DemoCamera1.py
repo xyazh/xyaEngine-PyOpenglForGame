@@ -7,7 +7,7 @@ from pyglgame.render.BufferBuilder import *
 from OpenGL.GL import *
 
 
-class DemoCamera1(Camera, IWindowCamera ,IClicker):
+class DemoCamera1(Camera, IWindowCamera):
     def __init__(self):
         super().__init__(auto_size=True)
 
@@ -17,12 +17,7 @@ class DemoCamera1(Camera, IWindowCamera ,IClicker):
     def creatFrameBuffer(self):
         return super().creatFrameBuffer()
 
-    def getPixelColor(self,x, y):
-        return super().getPixelColor(x, y)
-
     def renderEnd(self):
-        mos = self.window.getMouse()
-        print(self.getPixelColor(*mos))
         return super().renderEnd()
     
     def drawToWindow(self):

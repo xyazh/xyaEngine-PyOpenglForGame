@@ -9,22 +9,31 @@ class GameObject:
     @should_render.setter
     def should_render(self, value):
         self._should_render = value
+        render_layer = RenderGlobal.instance.render_layer
         if value:
-            RenderGlobal.instance.render_game_objects.add(self)
-        elif self in RenderGlobal.instance.render_game_objects:
-            RenderGlobal.instance.render_game_objects.remove(self)
+            render_layer.addGameObject(self)
+        else:
+            render_layer.removeGameObject(self)
 
     def __new__(cls, should_render=True, *args, **kwargs):
         instance = super().__new__(cls)
         RenderGlobal.instance.game_objects.append(instance)
         if should_render:
-            RenderGlobal.instance.render_game_objects.add(instance)
+            RenderGlobal.instance.render_layer.addGameObject(instance)
         return instance
+    
+    def getLayer(self)->int:
+        return 0
 
     def __init__(self, should_render=True):
         self._should_render = should_render
         self.clickable: bool = False
         self.data_color = (0, 0, 0, 0)
+
+    def isDataColor(self, r, g, b, a) -> bool:
+        return (self.data_color[0] == r and \
+                self.data_color[1] == g and \
+                self.data_color[2] == b)
 
     def preSrart(self):
         self.render_global = RenderGlobal.instance

@@ -9,10 +9,14 @@ class Shader:
         self.shader:int = shader
 
     def use(self):
+        if RenderGlobal.instance.using_shader == self:
+            return
         glUseProgram(self.shader)
         RenderGlobal.instance.using_shader = self
 
     def release(self):
+        if RenderGlobal.instance.using_shader == self:
+            return
         glUseProgram(0)
         RenderGlobal.instance.using_shader = None
 
