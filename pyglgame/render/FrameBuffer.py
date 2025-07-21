@@ -4,11 +4,10 @@ from .RenderBuffer import *
 
 
 class FrameBuffer:
-    def __init__(self, width: int, height: int, use_depth=False,param:int = GL_NEAREST):
+    def __init__(self, width: int, height: int, use_depth=False, param: int = GL_NEAREST, data: list = None):
         self.width = width
         self.height = height
         self.size = RenderGlobal.instance.window.size
-        self.window_shader = RenderGlobal.instance.dis_shader_1
         self.use_depth = use_depth
         # 创建帧缓冲对象
         self.framebuffer = glGenFramebuffers(1)
@@ -18,7 +17,7 @@ class FrameBuffer:
         self.texture_id = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, self.texture_id)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height,
-                     0, GL_RGBA, GL_FLOAT, None)
+                     0, GL_RGBA, GL_FLOAT, data)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, param)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param)
         glFramebufferTexture2D(
@@ -77,7 +76,8 @@ class FrameBuffer:
         self.bind()
         glViewport(0, 0, self.width, self.height)
         glClearColor(0, 0, 0, 0)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
+                GL_STENCIL_BUFFER_BIT)
         if self.use_depth:
             glEnable(GL_DEPTH_TEST)  # 启用深度测试
             glEnable(GL_STENCIL_TEST)  # 启用模板测试
@@ -93,7 +93,6 @@ class FrameBuffer:
         self.unbind()
         glViewport(0, 0, self.size.w, self.size.h)
 
-
     def cleanup(self):
         """清理帧缓冲对象及其资源"""
         glDeleteFramebuffers(1, [self.framebuffer])
@@ -103,7 +102,6 @@ class FrameBuffer:
 
     def drawToWindow(self):
         """将当前帧缓冲对象绘制到窗口"""
-        self.window_shader.use()
         self.bindTexture()
+        RenderGlobal.instance.using_shader.uniform1i("fuc", 1)
         self.render_buffer.draw()
-        self.window_shader.release()

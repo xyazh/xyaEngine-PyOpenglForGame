@@ -6,12 +6,13 @@ from .Shader import Shader
 from ..ResourceLocation import ResourceLocation
 from ..xyazhServer.ConsoleMessage import ConsoleMessage
 
+
 class ShaderManager:
     @staticmethod
-    def loadShader(file:str):
-        vertex_shader:int = 0
-        fragment_shader:int = 0
-        program:int = 0
+    def loadShader(file: str):
+        vertex_shader: int = 0
+        fragment_shader: int = 0
+        program: int = 0
         try:
             program = glCreateProgram()
             vertex_shader = glCreateShader(GL_VERTEX_SHADER)
@@ -19,7 +20,8 @@ class ShaderManager:
             glShaderSource(vertex_shader, vertex_shader_source)
             glCompileShader(vertex_shader)
             if glGetShaderiv(vertex_shader, GL_COMPILE_STATUS) == GL_FALSE:
-                ConsoleMessage.printError(glGetShaderInfoLog(vertex_shader))
+                ConsoleMessage.printError(
+                    str(glGetShaderInfoLog(vertex_shader), encoding="utf8"))
                 raise RuntimeError(f"Error compiling vertex shader: {file}")
 
             fragment_shader = glCreateShader(GL_FRAGMENT_SHADER)
@@ -27,7 +29,8 @@ class ShaderManager:
             glShaderSource(fragment_shader, fragment_shader_source)
             glCompileShader(fragment_shader)
             if glGetShaderiv(fragment_shader, GL_COMPILE_STATUS) == GL_FALSE:
-                ConsoleMessage.printError(glGetShaderInfoLog(fragment_shader))
+                ConsoleMessage.printError(
+                    str(glGetShaderInfoLog(fragment_shader), encoding="utf8"))
                 raise RuntimeError(f"Error compiling fragment shader: {file}")
 
             glAttachShader(program, vertex_shader)
@@ -35,7 +38,8 @@ class ShaderManager:
 
             glLinkProgram(program)
             if glGetProgramiv(program, GL_LINK_STATUS) == GL_FALSE:
-                ConsoleMessage.printError(glGetProgramInfoLog(program))
+                ConsoleMessage.printError(
+                    str(glGetProgramInfoLog(program), encoding="utf8"))
                 raise RuntimeError(f"Error linking shader program: {file}")
 
             glDeleteShader(vertex_shader)

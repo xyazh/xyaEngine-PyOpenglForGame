@@ -1,4 +1,4 @@
-#version 430 core
+#version 330 core
 
 const int POS = 1;
 const int COL = 2;

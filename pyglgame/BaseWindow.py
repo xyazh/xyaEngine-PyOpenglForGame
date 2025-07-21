@@ -16,15 +16,14 @@ class BaseWindow:
     def __init__(self, app: "App", title: str, size: tuple[float], position: tuple[float], full_screen: bool) -> None:
         self.setWindownSize(size)
         self.app = app
-        self.render_global = RenderGlobal(app, self)
+        self.render_global = RenderGlobal(app=app, window=self)
         self.pos_x, self.pos_y = position
         self.full_screen: bool = full_screen
         self.title: str = title
         self.initMouse()
-        self.key_set:set = set()
-        self.key_down_set:set = set()
+        self.key_set: set = set()
+        self.key_down_set: set = set()
         self.game_loop = GameMainLoop()
-
 
     def setWindownSize(self, size: tuple[float]) -> None:
         self.size = Size(*size)
@@ -36,7 +35,7 @@ class BaseWindow:
         glutInit(sys.argv)
         glutInitWindowPosition(self.pos_x, self.pos_y)
         glutInitWindowSize(self.size.w, self.size.h)
-        glutCreateWindow(self.title)
+        glutCreateWindow(self.title.encode())
         if self.full_screen:
             glutFullScreen()
         glutMouseFunc(self._mouseHit)
@@ -64,16 +63,15 @@ class BaseWindow:
         self.size_y = glutGet(GLUT_WINDOW_HEIGHT)
         self.size.updateSize(self.size_x, self.size_y)
 
-    def _keyDown(self,key):
+    def _keyDown(self, key):
         self.key_down_set.add(key)
         self.key_set.add(key)
 
-    def _keyUp(self,key):
+    def _keyUp(self, key):
         if key in self.key_set:
             self.key_set.remove(key)
 
-
-    def _keyHook(self,t:keyboard.KeyboardEvent):
+    def _keyHook(self, t: keyboard.KeyboardEvent):
         if t.event_type == "down":
             self._keyDown(t.name)
         else:
@@ -82,14 +80,14 @@ class BaseWindow:
     def clearKeyDown(self):
         self.key_down_set.clear()
 
-    def getKey(self,key)->bool:
+    def getKey(self, key) -> bool:
         return key in self.key_set
 
-    def getKeyDown(self,key)->bool:
+    def getKeyDown(self, key) -> bool:
         return key in self.key_down_set
 
     def _mouseHit(self, button, state, x, y):
-        self.on_mouse_x,self.on_mouse_y = x,y
+        self.on_mouse_x, self.on_mouse_y = x, y
         if button == 0:
             if state == 0:
                 self.mouse_left_on_hit = True
@@ -111,11 +109,12 @@ class BaseWindow:
             else:
                 self.mouse_right_button_on = False
             return
-    def _onMouseMove(self,x,y):
-        self.on_mouse_x,self.on_mouse_y = x,y
 
-    def _mouseMove(self,x,y):
-        self.mouse_x,self.mouse_y = x,y
+    def _onMouseMove(self, x, y):
+        self.on_mouse_x, self.on_mouse_y = x, y
+
+    def _mouseMove(self, x, y):
+        self.mouse_x, self.mouse_y = x, y
 
     def initMouse(self) -> None:
         self.mouse_left_button_on = False
@@ -134,38 +133,38 @@ class BaseWindow:
         self.mouse_middle_on_hit = False
         self.mouse_right_on_hit = False
 
-    def getMouse(self)->tuple:
-        return (self.mouse_x,self.mouse_y)
+    def getMouse(self) -> tuple:
+        return (self.mouse_x, self.mouse_y)
 
-    def getOnMouse(self)->tuple:
-        return (self.on_mouse_x,self.on_mouse_y)
+    def getOnMouse(self) -> tuple:
+        return (self.on_mouse_x, self.on_mouse_y)
 
-    def getMiddleClickMouse(self)->tuple:
+    def getMiddleClickMouse(self) -> tuple:
         if self.mouse_middle_on_hit:
-            return (self.on_mouse_x,self.on_mouse_y)
+            return (self.on_mouse_x, self.on_mouse_y)
         return None
 
-    def getRightClickMouse(self)->tuple:
+    def getRightClickMouse(self) -> tuple:
         if self.mouse_right_on_hit:
-            return (self.on_mouse_x,self.on_mouse_y)
+            return (self.on_mouse_x, self.on_mouse_y)
         return None
 
-    def getLeftClickMouse(self)->tuple:
+    def getLeftClickMouse(self) -> tuple:
         if self.mouse_left_on_hit:
-            return (self.on_mouse_x,self.on_mouse_y)
+            return (self.on_mouse_x, self.on_mouse_y)
         return None
 
-    def getLeftOnMouse(self)->tuple:
+    def getLeftOnMouse(self) -> tuple:
         if self.mouse_left_button_on:
-            return (self.on_mouse_x,self.on_mouse_y)
+            return (self.on_mouse_x, self.on_mouse_y)
         return None
 
-    def getMiddleOnMouse(self)->tuple:
+    def getMiddleOnMouse(self) -> tuple:
         if self.mouse_middle_button_on:
-            return (self.on_mouse_x,self.on_mouse_y)
+            return (self.on_mouse_x, self.on_mouse_y)
         return None
 
-    def getRightOnMouse(self)->tuple:
+    def getRightOnMouse(self) -> tuple:
         if self.mouse_right_button_on:
-            return (self.on_mouse_x,self.on_mouse_y)
+            return (self.on_mouse_x, self.on_mouse_y)
         return None

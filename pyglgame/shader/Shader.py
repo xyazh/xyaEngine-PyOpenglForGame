@@ -1,6 +1,8 @@
 import glm
+from typing import TYPE_CHECKING
 from OpenGL.GL import *
 from ..math.Matrix import Matrix
+
 from ..RenderGlobal import RenderGlobal
 
 
