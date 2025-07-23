@@ -36,6 +36,7 @@ class RenderBuffer:
         glBufferData(GL_ARRAY_BUFFER, len(vertices) * sizeof(c_float),
                      (c_float * len(vertices))(*vertices), self.usage)
 
+
     def draw(self, re_build: bool = True):
         self.build(re_build)
         shader = RenderGlobal.instance.using_shader
@@ -45,38 +46,39 @@ class RenderBuffer:
         self.configureVertexAttributes()
         glDrawArrays(self.buffer_builder.pri_type, 0, self.buffer_builder.size)
 
+
     def configureVertexAttributes(self):
         f_size = sizeof(c_float)
         stride = f_size * len(self.buffer_builder.temp_buffer)
         offset = 0
         format_type = self.buffer_builder.format_type
+        # 先全部禁用，避免残留状态
+        for i in range(6):
+            glDisableVertexAttribArray(i)
+
+        offset = 0
         if format_type & POS:
             glEnableVertexAttribArray(0)
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                                  stride, c_void_p(offset))
-            offset += f_size * 3
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, c_void_p(offset))
+            offset += sizeof(c_float) * 3
         if format_type & COL:
             glEnableVertexAttribArray(1)
-            glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
-                                  stride, c_void_p(offset))
-            offset += f_size * 4
+            glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, stride, c_void_p(offset))
+            offset += sizeof(c_float) * 4
         if format_type & TEX:
             glEnableVertexAttribArray(2)
-            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
-                                  stride, c_void_p(offset))
-            offset += f_size * 2
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, c_void_p(offset))
+            offset += sizeof(c_float) * 2
         if format_type & NOR:
             glEnableVertexAttribArray(3)
-            glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE,
-                                  stride, c_void_p(offset))
-            offset += f_size * 3
+            glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, c_void_p(offset))
+            offset += sizeof(c_float) * 3
         if format_type & LIT:
             glEnableVertexAttribArray(4)
-            glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE,
-                                  stride, c_void_p(offset))
-            offset += f_size * 2
+            glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, stride, c_void_p(offset))
+            offset += sizeof(c_float) * 2
         if format_type & SIZ:
             glEnableVertexAttribArray(5)
-            glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE,
-                                  stride, c_void_p(offset))
-            offset += f_size
+            glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, stride, c_void_p(offset))
+            offset += sizeof(c_float) * 1
+

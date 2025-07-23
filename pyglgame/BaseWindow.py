@@ -1,5 +1,6 @@
 import sys
 import keyboard
+import traceback
 from typing import TYPE_CHECKING
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -53,7 +54,6 @@ class BaseWindow:
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE)
         glutDisplayFunc(self.displayFunc)
         keyboard.hook(self._keyHook)
-        self.render_global.start()
         self.game_loop.start()
         self.game_loop.run()
         glutMainLoop()

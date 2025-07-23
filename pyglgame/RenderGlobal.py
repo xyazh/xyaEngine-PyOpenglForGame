@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from .BaseWindow import BaseWindow
     from .shader.Shader import Shader
     from .gameobject.GameObject import GameObject
+    from .gameobject.camera.Camera import Camera
 
 
 class RenderGlobal:
@@ -26,13 +27,15 @@ class RenderGlobal:
         self.bg: Color = Color(0, 0, 0)
         self.using_shader = None
         self.using_layer = RenderLayer()
-        self.layers: dict[object:RenderLayer] = {0: self.using_layer}
+        self.layers: dict[object, RenderLayer] = {0: self.using_layer}
+        self.cameras: set[Camera] = set()
 
     def __init__(self, *arg,  **kw) -> None:
-        pass
+        self.using_shader: "Shader" = None
 
     def start(self):
-        self.using_shader: "Shader" = None
+        for layer in self.layers.values():
+            layer.start()
 
     def useLayer(self, layer):
         if layer in self.layers:
@@ -42,12 +45,10 @@ class RenderGlobal:
         self.layers[layer] = self.using_layer
 
     def updateLayer(self, dt: float, tps: float):
-        layer: RenderLayer
         for layer in self.layers.values():
             layer.update(dt, tps)
 
     def renderLayer(self, dt: float, fps: float):
-        layer: RenderLayer
         for layer in self.layers.values():
             layer.render(dt, fps)
 
@@ -62,3 +63,13 @@ class RenderGlobal:
             self.using_layer.removeCamera(obj)
             return
         self.using_layer.removeObject(obj)
+
+    def addWindowCamera(self, camera: "Camera"):
+        self.cameras.add(camera)
+
+    def removeWindowCamera(self, camera: "Camera"):
+        if camera in self.cameras:
+            self.cameras.remove(camera)
+
+    def hasWindowCamera(self, camera: "Camera") -> bool:
+        return camera in self.cameras

@@ -4,7 +4,7 @@ from ..RenderGlobal import RenderGlobal
 class GameObject:
     def __new__(cls, is_camera: bool = False):
         obj = super().__new__(cls)
-        RenderGlobal.instance.addToLayer(obj, is_camera=False)
+        RenderGlobal.instance.addToLayer(obj, is_camera)
         return obj
 
     def __init__(self):
@@ -16,6 +16,9 @@ class GameObject:
     def delete(self):
         self.active = False
         RenderGlobal.instance.removeFromLayer(self)
+
+    def start(self):
+        pass
 
     def update(self, dt: float, tps: float):
         pass

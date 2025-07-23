@@ -18,6 +18,7 @@ class GameMainLoop:
         shader.use()
         self.window = self.render_global.window
         self.app = self.render_global.app
+        self.render_global.start()
 
     def doUpdate(self, dt: float, tps: float):
         self.render_global.updateLayer(dt, tps)
@@ -26,6 +27,10 @@ class GameMainLoop:
         glClearColor(*self.render_global.bg)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self.render_global.renderLayer(dt, fps)
+        glBindFramebuffer(GL_FRAMEBUFFER, 0)
+        for camera in self.render_global.cameras:
+            camera.windowCameraDraw()
+        #glFlush()
         glutSwapBuffers()
 
     def updateLoop(self):
@@ -41,5 +46,11 @@ class GameMainLoop:
         self.doRender(self.render_dt, fps)
 
     def run(self):
+        """while True:
+            if glutGetWindow() == 0:  # 窗口已关闭
+                pass
+            glutMainLoopEvent()  # 处理单个事件
+            glutPostRedisplay()  # 请求重绘
+            self.renderLoop()"""
         self.updateLoop()
         glutIdleFunc(self.renderLoop)
