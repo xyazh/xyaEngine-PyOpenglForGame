@@ -40,7 +40,7 @@ void dis()
     vec4 worldPos = vec4(aPos, 1.0);
     if ((formatType & POS) != 0) {
         // 之后要用矩阵变换，把这一行改为:
-        // worldPos = projection * view * translate * rotate * scale * vec4(aPos, 1.0);
+        worldPos = projection * view * translate * rotate * scale * vec4(aPos, 1.0);
         gl_Position = worldPos;
     } else {
         gl_Position = vec4(0.0);

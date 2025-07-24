@@ -1,3 +1,4 @@
+import glm
 from typing import TYPE_CHECKING
 from .math.Color import Color
 from .RenderLayer import RenderLayer
@@ -30,6 +31,14 @@ class RenderGlobal:
         self.layers: dict[object, RenderLayer] = {0: self.using_layer}
         self.cameras: set[Camera] = set()
 
+        
+        # === Model transforms ===
+        self._position = glm.vec3(0.0)
+        self._rotation = glm.vec3(0.0)  # in degrees
+        self._scale = glm.vec3(1.0)
+        self._model_dirty = True
+        self._model = glm.mat4(1.0)
+
     def __init__(self, *arg,  **kw) -> None:
         self.using_shader: "Shader" = None
 
@@ -49,6 +58,7 @@ class RenderGlobal:
             layer.update(dt, tps)
 
     def renderLayer(self, dt: float, fps: float):
+        self.updateGlobalUniforms()
         for layer in self.layers.values():
             layer.render(dt, fps)
 
@@ -73,3 +83,50 @@ class RenderGlobal:
 
     def hasWindowCamera(self, camera: "Camera") -> bool:
         return camera in self.cameras
+    
+    # === Model Matrix ===
+    def setPosition(self, pos: glm.vec3):
+        self._position = pos
+        self._model_dirty = True
+
+    def setRotation(self, rot: glm.vec3):
+        self._rotation = rot
+        self._model_dirty = True
+
+    def setScale(self, scale: glm.vec3):
+        self._scale = scale
+        self._model_dirty = True
+
+    @property
+    def translate(self):
+        return glm.translate(glm.mat4(1.0), self._position)
+
+    @property
+    def rotate(self):
+        r = self._rotation
+        mat = glm.mat4(1.0)
+        mat = glm.rotate(mat, glm.radians(r.x), glm.vec3(1, 0, 0))
+        mat = glm.rotate(mat, glm.radians(r.y), glm.vec3(0, 1, 0))
+        mat = glm.rotate(mat, glm.radians(r.z), glm.vec3(0, 0, 1))
+        return mat
+
+    @property
+    def scale(self):
+        return glm.scale(glm.mat4(1.0), self._scale)
+
+    @property
+    def model(self):
+        if self._model_dirty:
+            self._model = self.translate * self.rotate * self.scale
+            self._model_dirty = False
+        return self._model
+    
+    # === Uniform Helper ===
+
+    def updateGlobalUniforms(self, shader: "Shader" = None):
+        if shader == None:
+            shader = RenderGlobal.instance.using_shader
+        shader.uniformMatrix4fv("translate", self.translate)
+        shader.uniformMatrix4fv("rotate", self.rotate)
+        shader.uniformMatrix4fv("scale", self.scale)
+        # 可选：shader.setMat4("model", self.model)

@@ -9,6 +9,12 @@ class GameObject:
 
     def __init__(self):
         self.active: bool = True
+        self.x: float = 0
+        self.y: float = 0
+        self.z: float = 0
+        self.p: float = 0
+        self.t: float = 0
+        self.r: float = 0
 
     def __delete__(self):
         self.delete()

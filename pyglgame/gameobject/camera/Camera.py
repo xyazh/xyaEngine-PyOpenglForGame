@@ -1,3 +1,4 @@
+from .m.MBase import MBase
 from ..GameObject import GameObject
 from ...render.MSAAFrameBuffer import MSAAFrameBuffer
 from ...render.RenderBuffer import RenderBuffer
@@ -13,6 +14,7 @@ class Camera(GameObject):
     def __init__(self, msaa_val: int = 4):
         super().__init__()
         self._msaa_val = msaa_val
+        self.m: MBase = None
 
     def start(self):
         super().start()
@@ -28,11 +30,18 @@ class Camera(GameObject):
         self.buf_builder.pos(+1, +1, 0).tex(1, 1).end()    # top right
         self.buf_builder.pos(-1, +1, 0).tex(0, 1).end()   # top left
 
+    def setProjection(self, m: MBase):
+        self.m = m
+
     def createFrameBuffer(self):
         self.frame_buffer = MSAAFrameBuffer(
             self.size.w, self.size.w, use_depth=True, samples=self._msaa_val)
 
     def renderStart(self):
+        if self.m is not None:
+            self.m.setCameraPosAndPYR(
+                self.x, self.y, self.z, self.p, self.t, self.r)
+            self.m.setCameraUniforms()
         self.frame_buffer.drawStart()
 
     def renderEnd(self):
@@ -48,12 +57,12 @@ class Camera(GameObject):
                         top_right: tuple[float, float, float]):
         self.buf_builder = self.render_buffer.createBuffer(
             GL_TRIANGLES, POS | TEX)
-        self.buf_builder.pos(*bottom_left).tex(0, 0).end()  # bottom left
-        self.buf_builder.pos(*bottom_right).tex(1, 0).end()   # bottom right
-        self.buf_builder.pos(*top_left).tex(0, 1).end()   # top left
-        self.buf_builder.pos(*bottom_right).tex(1, 0).end()   # bottom right
-        self.buf_builder.pos(*top_right).tex(1, 1).end()    # top right
-        self.buf_builder.pos(*top_left).tex(0, 1).end()   # top left
+        self.buf_builder.pos(*bottom_left).tex(0, 0).end()
+        self.buf_builder.pos(*bottom_right).tex(1, 0).end()
+        self.buf_builder.pos(*top_left).tex(0, 1).end()
+        self.buf_builder.pos(*bottom_right).tex(1, 0).end()
+        self.buf_builder.pos(*top_right).tex(1, 1).end()
+        self.buf_builder.pos(*top_left).tex(0, 1).end()
 
     def windowCameraDraw(self):
         self.frame_buffer.bindTexture()
