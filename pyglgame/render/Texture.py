@@ -1,6 +1,7 @@
 from typing import Optional
 from typing import TYPE_CHECKING
 from OpenGL.GL import *
+from ..RenderGlobal import RenderGlobal
 
 if TYPE_CHECKING:
     from .Image import Image
@@ -17,9 +18,9 @@ class Texture:
         texture_id = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texture_id)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-                         width, height,
-                         0, GL_RGBA, GL_UNSIGNED_BYTE,
-                         data)
+                     width, height,
+                     0, GL_RGBA, GL_UNSIGNED_BYTE,
+                     data)
         if mipmap:
             glGenerateMipmap(GL_TEXTURE_2D)
             if filter == NEAREST:
@@ -63,5 +64,9 @@ class Texture:
     def __del__(self):
         glDeleteTextures(self.id)
 
-    def bind(self):
+    def bind(self, uint=GL_TEXTURE0):
+        glActiveTexture(uint)
         glBindTexture(GL_TEXTURE_2D, self.id)
+        shader = RenderGlobal.instance.using_shader
+        if shader is not None:
+            shader.uniformTex(uint)

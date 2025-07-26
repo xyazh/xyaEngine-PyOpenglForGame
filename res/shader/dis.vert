@@ -10,7 +10,10 @@ const int SIZ = 32;
 
 const int DIS = 0;
 const int WID = 1;
-
+const int HDR = 2;
+const int PIN = 3;
+const int BLM = 4;
+const int MIX = 5;
 // 顶点属性
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec4 aColor;
@@ -27,6 +30,8 @@ uniform mat4 rotate;
 uniform mat4 translate;
 uniform mat4 view;
 uniform mat4 projection;
+uniform vec2 wh;
+uniform vec2 win_wh;
 
 // 输出
 out vec4 fragColor;
@@ -66,13 +71,28 @@ void wid()
     fragFormatType = formatType;
 }
 
+void bloom(){
+    gl_Position    = vec4(aPos, 1.0);  // 通常用于传屏幕坐标
+    fragColor      = ((formatType & COL) != 0) ? aColor : vec4(0.0);
+    fragTexCoord   = ((formatType & TEX) != 0) ? aTexCoord : vec2(0.0);
+    fragFormatType = formatType;
+}
+
 void main()
 {
     if (fuc == DIS) {
         dis();
     } else if (fuc == WID) {
         wid();
-    } else {
+    } else if (fuc == HDR) {
+        wid();
+    } else if (fuc == PIN) {
+        wid();
+    }else if (fuc == BLM) {
+        wid();
+    }else if (fuc == MIX) {
+        wid();
+    }else  {
         // 未来扩展：其他绘制函数
         gl_Position = vec4(0.0); // 避免未定义行为
     }

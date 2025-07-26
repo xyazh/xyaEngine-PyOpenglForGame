@@ -4,6 +4,7 @@ from OpenGL.GLUT import *
 from .xyaHelper import *
 from .RenderGlobal import RenderGlobal
 from .shader.ShaderManager import ShaderManager
+from .render.RenderBuffer import *
 
 
 class GameMainLoop:
@@ -20,17 +21,29 @@ class GameMainLoop:
         self.app = self.render_global.app
         self.render_global.start()
 
+        self.render_global.render_buffer = RenderBuffer(GL_STATIC_DRAW)
+        buf_builder = self.render_global.render_buffer.createBuffer(
+            GL_TRIANGLES, POS | TEX)
+        buf_builder.pos(-1, -1, 0).tex(0, 0).end()  # bottom left
+        buf_builder.pos(+1, -1, 0).tex(1, 0).end()   # bottom right
+        buf_builder.pos(-1, +1, 0).tex(0, 1).end()   # top left
+        buf_builder.pos(+1, -1, 0).tex(1, 0).end()   # bottom right
+        buf_builder.pos(+1, +1, 0).tex(1, 1).end()    # top right
+        buf_builder.pos(-1, +1, 0).tex(0, 1).end()   # top left
+
     def doUpdate(self, dt: float, tps: float):
         self.render_global.updateLayer(dt, tps)
 
     def doRender(self, dt: float, fps: float):
         glClearColor(*self.render_global.bg)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        self.render_global.using_shader.uniform2f(
+            "win_wh", self.window.size.w, self.window.size.h)
         self.render_global.renderLayer(dt, fps)
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         for camera in self.render_global.cameras:
             camera.windowCameraDraw()
-        #glFlush()
+        # glFlush()
         glutSwapBuffers()
 
     def updateLoop(self):

@@ -15,6 +15,7 @@ class GameObject:
         self.p: float = 0
         self.t: float = 0
         self.r: float = 0
+        self.started: bool = False
 
     def __delete__(self):
         self.delete()
@@ -24,7 +25,7 @@ class GameObject:
         RenderGlobal.instance.removeFromLayer(self)
 
     def start(self):
-        pass
+        self.started = True
 
     def update(self, dt: float, tps: float):
         pass

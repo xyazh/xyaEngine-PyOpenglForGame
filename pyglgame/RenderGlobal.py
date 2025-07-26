@@ -31,7 +31,6 @@ class RenderGlobal:
         self.layers: dict[object, RenderLayer] = {0: self.using_layer}
         self.cameras: set[Camera] = set()
 
-        
         # === Model transforms ===
         self._position = glm.vec3(0.0)
         self._rotation = glm.vec3(0.0)  # in degrees
@@ -83,10 +82,10 @@ class RenderGlobal:
 
     def hasWindowCamera(self, camera: "Camera") -> bool:
         return camera in self.cameras
-    
+
     # === Model Matrix ===
-    def setPosition(self, pos: glm.vec3):
-        self._position = pos
+    def setPosition(self, x, y, z):
+        self._position = glm.vec3(x, y, z)
         self._model_dirty = True
 
     def setRotation(self, rot: glm.vec3):
@@ -120,12 +119,12 @@ class RenderGlobal:
             self._model = self.translate * self.rotate * self.scale
             self._model_dirty = False
         return self._model
-    
+
     # === Uniform Helper ===
 
     def updateGlobalUniforms(self, shader: "Shader" = None):
         if shader == None:
-            shader = RenderGlobal.instance.using_shader
+            shader = self.using_shader
         shader.uniformMatrix4fv("translate", self.translate)
         shader.uniformMatrix4fv("rotate", self.rotate)
         shader.uniformMatrix4fv("scale", self.scale)

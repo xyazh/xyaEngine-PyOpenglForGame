@@ -2,7 +2,6 @@ from OpenGL.GL import *
 from ..RenderGlobal import RenderGlobal
 from .RenderBuffer import *
 
-
 class FrameBuffer:
     def __init__(self, width: int, height: int, use_depth=False, param: int = GL_NEAREST, data: list = None):
         self.width = width
