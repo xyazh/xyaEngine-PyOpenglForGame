@@ -65,14 +65,14 @@ void dis()
 void wid()
 {
     // 用于屏幕空间绘制，例如后处理、GUI 等
-    gl_Position    = vec4(aPos, 1.0);  // 通常用于传屏幕坐标
+    gl_Position    = vec4(aPos, 1.0); 
     fragColor      = ((formatType & COL) != 0) ? aColor : vec4(0.0);
     fragTexCoord   = ((formatType & TEX) != 0) ? aTexCoord : vec2(0.0);
     fragFormatType = formatType;
 }
 
 void bloom(){
-    gl_Position    = vec4(aPos, 1.0);  // 通常用于传屏幕坐标
+    gl_Position    = vec4(aPos, 1.0); 
     fragColor      = ((formatType & COL) != 0) ? aColor : vec4(0.0);
     fragTexCoord   = ((formatType & TEX) != 0) ? aTexCoord : vec2(0.0);
     fragFormatType = formatType;
@@ -94,6 +94,6 @@ void main()
         wid();
     }else  {
         // 未来扩展：其他绘制函数
-        gl_Position = vec4(0.0); // 避免未定义行为
+        gl_Position = vec4(0.0); 
     }
 }

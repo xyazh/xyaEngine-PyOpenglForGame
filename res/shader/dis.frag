@@ -42,7 +42,6 @@ const vec4 defaultColor = vec4(1.0);
 
 
 vec3 toneMap(vec3 hdrColor) {
-    // Reinhard tone mapping
     return hdrColor / (hdrColor + vec3(1.0));
 }
 
@@ -120,28 +119,20 @@ vec4 pin()
     }
     if ((fragFormatType & TEX) != 0) {
         vec2 pixTex = fragTexCoord * win_wh;
-        vec2 offsets[13] = vec2[](
+        vec2 offsets[5] = vec2[](
             vec2(0.0, 0.0),
             vec2(5.0, 5.0),
             vec2(-5.0, 5.0),
             vec2(5.0, -5.0),
-            vec2(-5.0, -5.0),
-            vec2(13.0, 0.0),
-            vec2(-13.0, 0.0),
-            vec2(0.0, -13.0),
-            vec2(0.0, 13.0),
-            vec2(19.0, 19.0),
-            vec2(-19.0, 19.0),
-            vec2(19.0, -19.0),
-            vec2(-19.0, -19.0)
+            vec2(-5.0, -5.0)
         );
         vec3 sum = vec3(0.0);
-        for (int i = 0; i < 13; ++i) {
+        for (int i = 0; i < 5; ++i) {
             vec2 uv = (pixTex + offsets[i]) / win_wh;
             sum += texture(tex0, uv).rgb;
         }
 
-        vec3 avg = sum / 13.0;
+        vec3 avg = sum / 5.0;
         color *= vec4(avg, 1.0);
     }
     return color;

@@ -15,14 +15,14 @@ import colorsys
 # 黑体辐射算法 (简化版)
 
 
-def generate_random_triangles(buffer_builder, count=500000, scale=1, center=(0, 0, 0)):
+def generate_random_triangles(buffer_builder, count=200000, scale=1, center=(0, 0, 0)):
     for _ in range(count):
         cx, cy, cz = (random.uniform(-5000, 5000),
                       random.uniform(-5000, 5000),
                       random.uniform(20, 10000))
         # 每个三角形的三个顶点
         # 生成基础色温 (2000~15000K)
-        scale = random.random()*5+1
+        scale = random.random()*30+1
         for _ in range(3):
             # 随机位置
             x = cx + random.uniform(-scale, scale)
@@ -72,7 +72,7 @@ class TestCamera(Camera):
         return super().__new__(cls, msaa_val=8)
 
     def update(self, dt, tps):
-        self.z += dt*10
+        self.z += dt*100
         # self.r += dt*10
         if self.z > 10000:
             self.z = 0

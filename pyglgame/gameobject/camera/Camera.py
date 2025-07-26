@@ -75,7 +75,7 @@ class Camera(GameObject):
 
     def pingpong(self):
         ping_or_pong = 1
-        for _ in range(20):
+        for _ in range(4):
             ping_or_pong ^= 1
             if ping_or_pong == 1:
                 self.bloom_ping.drawStart()
