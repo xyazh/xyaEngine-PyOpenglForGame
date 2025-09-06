@@ -23,17 +23,19 @@ class Camera(GameObject):
         self.h: int = 540
         self.w1: int = 96
         self.h1: int = 54
+        self.render_global: RenderGlobal = None
 
     def start(self):
         super().start()
+        self.render_global = RenderGlobal.instance
         self.size = RenderGlobal.instance.window.size
         self.createFrameBuffer()
         self.render_buffer = RenderBuffer.getWindownRenderBuffer()
-        
+
         if self.use_bloom:
             if self.bloom_ping is None:
                 self.bloom_ping = MSAAFrameBuffer(
-                    self.w, self.h, param=GL_LINEAR,samples=8)
+                    self.w, self.h, param=GL_LINEAR, samples=8)
             if self.bloom_pong is None:
                 self.bloom_pong = MSAAFrameBuffer(
                     self.w1, self.h1, param=GL_LINEAR)
@@ -58,6 +60,8 @@ class Camera(GameObject):
 
     def renderEnd(self):
         self.frame_buffer.drawEnd()
+        if not self.use_bloom:
+            return
         self.copyOrigiral()
         self.getHDRPix()
         self.pingpong()

@@ -58,6 +58,7 @@ class RenderGlobal:
 
     def renderLayer(self, dt: float, fps: float):
         self.updateGlobalUniforms()
+        self.using_shader.uniform1i("fuc", 0)
         for layer in self.layers.values():
             layer.render(dt, fps)
 

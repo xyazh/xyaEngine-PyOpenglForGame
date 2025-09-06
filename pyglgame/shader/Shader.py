@@ -40,23 +40,30 @@ UINT_MAP = {
 }
 
 
-
-
 class Shader:
     def __init__(self, shader: int):
         self.shader: int = shader
 
     def use(self):
-        if RenderGlobal.instance.using_shader == self:
+        render_global = RenderGlobal.instance
+        if render_global is None:
+            glUseProgram(self.shader)
+            print(self.shader)
+            return
+        if render_global.using_shader == self:
             return
         glUseProgram(self.shader)
-        RenderGlobal.instance.using_shader = self
+        render_global.using_shader = self
 
     def release(self):
-        if RenderGlobal.instance.using_shader == self:
+        render_global = RenderGlobal.instance
+        if render_global is None:
+            glUseProgram(0)
+            return
+        if render_global.using_shader == self:
             return
         glUseProgram(0)
-        RenderGlobal.instance.using_shader = None
+        render_global.using_shader = None
 
     def getShaderId(self) -> int:
         return self.shader
@@ -71,6 +78,18 @@ class Shader:
     def uniform1i(self, name: str, i: int):
         loc = self.getLoc(name)
         glUniform1i(loc, i)
+
+    def uniform2i(self, name: str, i0: int, i1: int):
+        loc = self.getLoc(name)
+        glUniform2i(loc, i0, i1)
+
+    def  uniform3i(self, name: str, i0: int, i1: int, i2: int):
+        loc = self.getLoc(name)
+        glUniform3i(loc, i0, i1, i2)
+
+    def uniform4i(self, name: str, i0: int, i1: int, i2: int, i3: int):
+        loc = self.getLoc(name)
+        glUniform4i(loc, i0, i1, i2, i3)
 
     def uniformTex(self, uint):
         loc = self.getLoc(UINT_MAP[uint][0])
@@ -94,3 +113,11 @@ class Shader:
 
     def getLoc(self, name: str):
         return glGetUniformLocation(self.getShaderId(), name)
+
+    def dispatch(self, x: int, y: int = 1, z: int = 1):
+        """Dispatch compute shader."""
+        glDispatchCompute(x, y, z)
+
+    def memoryBarrier(self, barrier=GL_ALL_BARRIER_BITS):
+        """Call glMemoryBarrier after dispatch."""
+        glMemoryBarrier(barrier)

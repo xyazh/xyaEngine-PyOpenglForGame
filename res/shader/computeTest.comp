@@ -1,0 +1,79 @@
+#version 430
+
+layout (local_size_x = 8, local_size_y = 8) in;
+
+layout (binding = 0, rgba32f) readonly uniform image2D inputImage;
+layout (binding = 1, rgba32f) writeonly uniform image2D pingpongImage1; // p1Size (上采样目标)
+layout (binding = 2, rgba32f) writeonly uniform image2D pingpongImage2; // p2Size (下采样目标)
+
+uniform int pingOrPong;   // 0 = horizontal blur, 1 = vertical blur
+uniform ivec2 p1Size;     // pingpongImage1 的尺寸
+uniform ivec2 p2Size;     // pingpongImage2 的尺寸
+
+// 高斯半径
+const int RADIUS = 5;
+const float weights[11] = float[11](
+    0.06136, 0.06136,
+    0.09832, 0.09832,
+    0.13169, 0.13169,
+    0.09832, 0.09832,
+    0.06136, 0.06136,
+    0.01821
+);
+
+// ==========================
+// 高斯模糊函数
+// ==========================
+vec4 gaussianBlur(ivec2 coord, ivec2 size) {
+    vec4 color = vec4(0.0);
+    float totalWeight = 0.0;
+
+    for (int i = -RADIUS; i <= RADIUS; i++) {
+        ivec2 offset = (pingOrPong == 0) ? ivec2(i, 0) : ivec2(0, i);
+        ivec2 samplePos = clamp(coord + offset, ivec2(0), size - ivec2(1));
+
+        float w = weights[abs(i)];
+        color += imageLoad(inputImage, samplePos) * w;
+        totalWeight += w;
+    }
+    return color / totalWeight;
+}
+
+// ==========================
+// 双线性插值采样函数
+// ==========================
+vec4 bilinearSample(vec2 uv, ivec2 size) {
+    vec2 coord = uv * vec2(size) - 0.5;   // 对齐像素中心
+    ivec2 base = ivec2(floor(coord));
+    vec2 f = fract(coord);
+
+    vec4 c00 = imageLoad(inputImage, clamp(base, ivec2(0), size - ivec2(1)));
+    vec4 c10 = imageLoad(inputImage, clamp(base + ivec2(1, 0), ivec2(0), size - ivec2(1)));
+    vec4 c01 = imageLoad(inputImage, clamp(base + ivec2(0, 1), ivec2(0), size - ivec2(1)));
+    vec4 c11 = imageLoad(inputImage, clamp(base + ivec2(1, 1), ivec2(0), size - ivec2(1)));
+
+    return mix(mix(c00, c10, f.x), mix(c01, c11, f.x), f.y);
+}
+
+void main() {
+    ivec2 gid = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 inSize = imageSize(inputImage);
+
+    // ========== 上采样：写入 pingpongImage1 ==========
+    if (all(lessThan(gid, p1Size))) {
+        vec2 uv = (vec2(gid) + 0.5) / vec2(p1Size);   // 归一化坐标
+        vec4 sampled = bilinearSample(uv, inSize);    // 双线性采样
+        ivec2 srcCoord = ivec2(uv * vec2(inSize));
+        vec4 blurColor = gaussianBlur(srcCoord, inSize) * sampled; // 融合模糊结果
+        imageStore(pingpongImage1, gid, blurColor);
+    }
+
+    // ========== 下采样：写入 pingpongImage2 ==========
+    if (all(lessThan(gid, p2Size))) {
+        vec2 uv = (vec2(gid) + 0.5) / vec2(p2Size);
+        vec4 sampled = bilinearSample(uv, inSize);
+        ivec2 srcCoord = ivec2(uv * vec2(inSize));
+        vec4 blurColor = gaussianBlur(srcCoord, inSize) * sampled;
+        imageStore(pingpongImage2, gid, blurColor);
+    }
+}

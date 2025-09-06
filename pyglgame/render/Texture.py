@@ -2,6 +2,7 @@ from typing import Optional
 from typing import TYPE_CHECKING
 from OpenGL.GL import *
 from ..RenderGlobal import RenderGlobal
+from .TextureBase import TextureBase
 
 if TYPE_CHECKING:
     from .Image import Image
@@ -10,17 +11,18 @@ NEAREST = 0
 LINEAR = 1
 
 
-class Texture:
+class Texture(TextureBase):
     @staticmethod
-    def createDataTexture(data,
+    def createDataTexture(image: "Image",
                           width: int, height: int,
                           filter: int = LINEAR, mipmap: bool = False, wrap_mode: int = GL_REPEAT) -> "Texture":
         texture_id = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texture_id)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+        x = GL_RGBA32F if image.use_hdr else GL_RGBA
+        glTexImage2D(GL_TEXTURE_2D, 0, x,
                      width, height,
                      0, GL_RGBA, GL_UNSIGNED_BYTE,
-                     data)
+                     image.data)
         if mipmap:
             glGenerateMipmap(GL_TEXTURE_2D)
             if filter == NEAREST:
@@ -56,17 +58,16 @@ class Texture:
             width = image.width
         if height == -1:
             height = image.height
-        return Texture.createDataTexture(image.data, width, height, filter, mipmap, wrap_mode)
+        return Texture.createDataTexture(image, width, height, filter, mipmap, wrap_mode)
 
-    def __init__(self, id: int):
-        self.id = id
-
-    def __del__(self):
-        glDeleteTextures(self.id)
-
-    def bind(self, uint=GL_TEXTURE0):
-        glActiveTexture(uint)
+    def bind(self, unit=GL_TEXTURE0):
+        glActiveTexture(unit)
         glBindTexture(GL_TEXTURE_2D, self.id)
         shader = RenderGlobal.instance.using_shader
         if shader is not None:
-            shader.uniformTex(uint)
+            shader.uniformTex(unit)
+
+    def bindImage2D(self, uint=0):
+        glBindTexture(GL_TEXTURE_2D, self.id)
+        glBindImageTexture(uint, self.id, 0,
+                           GL_FALSE, 0, GL_READ_ONLY, GL_RGBA32F)

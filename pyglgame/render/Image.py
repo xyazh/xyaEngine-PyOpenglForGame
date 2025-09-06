@@ -21,9 +21,14 @@ class Image:
     def height(self,value:int):
         pass
 
-    def __init__(self,resource_location:ResourceLocation):
+    def __init__(self,resource_location:ResourceLocation,use_hdr: bool = False):
         self.image:PILImage = PILImage.open(resource_location.getIO()).convert("RGBA")
-        self.data = np.array(self.image)
+        if use_hdr:
+            self.data = np.array(self.image,dtype=np.float32)
+            #self.data = np.divide(self.data,255.0)
+        else:
+            self.data = np.array(self.image)
+        self.use_hdr:bool = use_hdr
 
     def getTexture(self) -> Texture:
         return Texture.createFromImage(self)

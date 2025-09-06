@@ -194,4 +194,5 @@ void main()
     } else {
         outColor = vec4(1.0, 0.0, 1.0, 1.0); // 未知渲染模式：高亮粉色
     }
+    //outColor = vec4(1.0, 0.0, 1.0, 1.0);
 }

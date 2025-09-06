@@ -8,17 +8,19 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class PerspectiveParams:
-    fov: float = 45.0
-    aspect: float = 1.0
+class OrthographicParams:
+    left: float = -10.0
+    right: float = 10.0
+    bottom: float = -10.0
+    top: float = 10.0
     near: float = 0.1
     far: float = 10000.0
 
 
-class MPerspective(MBase):
+class MOrthographic(MBase):
     def __init__(self):
         # === Projection ===
-        self.perspective_params = PerspectiveParams()
+        self.ortho_params = OrthographicParams()
         self._projection_dirty = True
         self._projection = glm.mat4(1.0)
 
@@ -30,33 +32,67 @@ class MPerspective(MBase):
         self._up = glm.vec3(0.0, 1.0, 0.0)
 
     # === Projection Matrix ===
-
-    def setPerspective(self, fov=None, aspect=None, near=None, far=None):
-        p = self.perspective_params
-        if fov is not None:
-            p.fov = fov
-        if aspect is not None:
-            p.aspect = aspect
+    def setOrthographic(self, left=None, right=None, bottom=None, top=None, near=None, far=None):
+        p = self.ortho_params
+        if left is not None:
+            p.left = left
+        if right is not None:
+            p.right = right
+        if bottom is not None:
+            p.bottom = bottom
+        if top is not None:
+            p.top = top
         if near is not None:
             p.near = near
         if far is not None:
             p.far = far
         self._projection_dirty = True
 
+    def setBySize(self, width, height, near=None, far=None):
+        """通过宽度和高度设置正交投影"""
+        half_w = width / 2.0
+        half_h = height / 2.0
+        self.setOrthographic(
+            left=-half_w,
+            right=half_w,
+            bottom=-half_h,
+            top=half_h,
+            near=near,
+            far=far
+        )
+
     @property
     def projection(self):
         if self._projection_dirty:
-            p = self.perspective_params
-            self._projection = glm.perspective(
-                glm.radians(p.fov), p.aspect, p.near, p.far)
+            p = self.ortho_params
+            self._projection = glm.ortho(
+                p.left, p.right, p.bottom, p.top, p.near, p.far
+            )
             self._projection_dirty = False
         return self._projection
 
     def updateAspectFromSize(self, width, height):
-        if height != 0:
-            self.setPerspective(aspect=width / height)
+        """根据窗口尺寸更新正交投影范围，保持宽高比"""
+        if height == 0:
+            return
+        aspect = width / height
+        
+        # 计算当前高度范围
+        current_height = self.ortho_params.top - self.ortho_params.bottom
+        # 保持高度不变，根据宽高比调整宽度
+        new_width = current_height * aspect
+        center_x = (self.ortho_params.left + self.ortho_params.right) / 2.0
+        center_y = (self.ortho_params.bottom + self.ortho_params.top) / 2.0
+        
+        self.setOrthographic(
+            left=center_x - new_width / 2.0,
+            right=center_x + new_width / 2.0,
+            bottom=center_y - current_height / 2.0,
+            top=center_y + current_height / 2.0
+        )
 
     # === View Matrix ===
+    # 以下视图矩阵方法与透视投影完全一致
     def lookAt(self, eye, target, up=glm.vec3(0.0, 1.0, 0.0)):
         self._eye = eye
         self._target = target
@@ -64,18 +100,10 @@ class MPerspective(MBase):
         self._view_dirty = True
 
     def lookAtEuler(self, position: glm.vec3, pitch: float, yaw: float, roll: float = 0.0) -> glm.vec3:
-        """
-        从相机位置 + 欧拉角 计算出 view 矩阵。
-        pitch: 上下（x轴旋转）
-        yaw: 左右（y轴旋转）
-        roll: 倾斜（z轴旋转）
-        """
-        # 转换为弧度
         pitch_rad = glm.radians(pitch)
         yaw_rad = glm.radians(yaw)
         roll_rad = glm.radians(roll)
 
-        # 方向向量 (单位向量)
         direction = glm.vec3(
             glm.cos(pitch_rad) * glm.sin(yaw_rad),
             glm.sin(pitch_rad),
@@ -83,15 +111,11 @@ class MPerspective(MBase):
         )
         direction = glm.normalize(direction)
 
-        # 默认 up 向量
         world_up = glm.vec3(0.0, 1.0, 0.0)
-
-        # 滚转（roll）影响的是右向量与上向量的方向
         right = glm.normalize(glm.cross(direction, world_up))
         up = glm.cross(right, direction)
 
         if roll != 0.0:
-            # 绕方向向量旋转 up
             roll_matrix = glm.rotate(glm.mat4(1.0), roll_rad, direction)
             up = glm.vec3(roll_matrix * glm.vec4(up, 0.0))
 
@@ -107,7 +131,7 @@ class MPerspective(MBase):
 
     # === Uniform Helper ===
     def setCameraUniforms(self, shader: "Shader" = None):
-        if shader == None:
+        if shader is None:
             shader = RenderGlobal.instance.using_shader
         shader.uniformMatrix4fv("projection", self.projection)
         shader.uniformMatrix4fv("view", self.view)

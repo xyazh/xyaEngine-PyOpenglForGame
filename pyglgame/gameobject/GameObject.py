@@ -32,3 +32,6 @@ class GameObject:
 
     def render(self, dt: float, fps: float):
         pass
+
+    def _render(self, dt: float, fps: float):
+        pass

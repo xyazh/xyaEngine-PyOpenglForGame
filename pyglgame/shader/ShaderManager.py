@@ -58,3 +58,37 @@ class ShaderManager:
     @staticmethod
     def readFile(file):
         return ResourceLocation(file).toBytes()
+
+    @staticmethod
+    def loadComputeShader(file: str) -> Shader:
+        compute_shader: int = 0
+        program: int = 0
+        try:
+            program = glCreateProgram()
+            compute_shader = glCreateShader(GL_COMPUTE_SHADER)
+            compute_shader_source = ShaderManager.readFile(f"{file}.comp")
+            glShaderSource(compute_shader, compute_shader_source)
+            glCompileShader(compute_shader)
+
+            if glGetShaderiv(compute_shader, GL_COMPILE_STATUS) == GL_FALSE:
+                ConsoleMessage.printError(
+                    str(glGetShaderInfoLog(compute_shader), encoding="utf8"))
+                raise RuntimeError(f"Error compiling compute shader: {file}")
+
+            glAttachShader(program, compute_shader)
+            glLinkProgram(program)
+            if glGetProgramiv(program, GL_LINK_STATUS) == GL_FALSE:
+                ConsoleMessage.printError(
+                    str(glGetProgramInfoLog(program), encoding="utf8"))
+                raise RuntimeError(f"Error linking compute shader program: {file}")
+
+            glDeleteShader(compute_shader)
+            return Shader(program)
+
+        except Exception as e:
+            if compute_shader:
+                glDeleteShader(compute_shader)
+            ConsoleMessage.printError(f"Failed to load compute shader: {file}")
+            logging.exception(e)
+            return Shader(0)
+    

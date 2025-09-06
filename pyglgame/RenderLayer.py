@@ -43,6 +43,8 @@ class RenderLayer:
                 obj.update(dt, tps)
 
     def render(self, dt: float, fps: float):
+        for obj in self.objects:
+            obj._render(dt, fps)
         for camera in self.cameras:
             camera.renderStart()
             for obj in self.objects:

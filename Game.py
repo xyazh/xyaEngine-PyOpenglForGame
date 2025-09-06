@@ -12,9 +12,6 @@ import random
 import colorsys
 
 
-# 黑体辐射算法 (简化版)
-
-
 def generate_random_triangles(buffer_builder, count=200000, scale=1, center=(0, 0, 0)):
     for _ in range(count):
         cx, cy, cz = (random.uniform(-5000, 5000),
@@ -31,7 +28,7 @@ def generate_random_triangles(buffer_builder, count=200000, scale=1, center=(0, 
             # 随机颜色
 
             # 随机色调（0~1），饱和度高，亮度高
-            h = random.random()
+            h = random.random()*5+1
             s = 1.0
             v = random.uniform(3.0, 10.0)  # HDR亮度
 
@@ -41,7 +38,25 @@ def generate_random_triangles(buffer_builder, count=200000, scale=1, center=(0, 
             b *= v
 
             a = 1.0
-            buffer_builder.pos(x, y, z).col(r, g, b, a).end()
+            buffer_builder.pos(x, y, z).col(r, g, b, a).siz(10000).end()
+
+def generate_random_points(buffer_builder, count=200000, scale=10000):
+    for _ in range(count):
+            # 随机位置
+        x = random.uniform(-5000, 5000)
+        y = random.uniform(-5000, 5000)
+        z = random.uniform(20, 10000)
+        # 随机颜色
+        # 随机色调（0~1），饱和度高，亮度高
+        h = random.random()*5+1
+        s = 1.0
+        v = random.uniform(3.0, 10.0)  # HDR亮度
+        r, g, b = colorsys.hsv_to_rgb(h, s, 1.0)
+        r *= v
+        g *= v
+        b *= v
+        a = 1.0
+        buffer_builder.pos(x, y, z).col(r, g, b, a).siz(scale).end()
 
 
 class TestObject(GameObject):
@@ -50,18 +65,21 @@ class TestObject(GameObject):
 
     def start(self):
         render_buffer = RenderBuffer()
-        buffer_builder = render_buffer.createBuffer(GL_TRIANGLES, POS | COL)
-        generate_random_triangles(buffer_builder)
+        buffer_builder = render_buffer.createBuffer(GL_POINTS, POS | COL | SIZ)
+        #generate_random_triangles(buffer_builder)
+        generate_random_points(buffer_builder)
         self.render_buffer = render_buffer
+        self.render_buffer.build()
+        self.render_buffer.buffer_builder.buffer.clear()
 
     def render(self, dt, fps):
-        RenderGlobal.instance.using_shader.uniform1i("fuc", 0)
         RenderGlobal.instance.setPosition(0, 0, 10000)
         RenderGlobal.instance.updateGlobalUniforms()
         self.render_buffer.draw(False)
         RenderGlobal.instance.setPosition(0, 0, 0)
         RenderGlobal.instance.updateGlobalUniforms()
         self.render_buffer.draw(False)
+        
 
         print(fps)
         return super().render(dt, fps)
@@ -71,9 +89,11 @@ class TestCamera(Camera):
     def __new__(cls, msaa_val: int = 4):
         return super().__new__(cls, msaa_val=8)
 
+
+
     def update(self, dt, tps):
-        self.z += dt*100
-        # self.r += dt*10
+        self.z += dt*1000
+        #self.r += dt*10
         if self.z > 10000:
             self.z = 0
         return super().update(dt, tps)
