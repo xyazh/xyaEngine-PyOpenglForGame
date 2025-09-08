@@ -12,6 +12,8 @@ class TextureStorage2D(TextureBase):
         glBindTexture(GL_TEXTURE_2D, 0)
         self.w = w
         self.h = h
+        self.group_x = int((w + 15) // 16)
+        self.group_y = int((h + 15) // 16)
 
 
     def bind(self, unit=GL_TEXTURE0):

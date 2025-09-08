@@ -38,9 +38,9 @@ def generate_random_triangles(buffer_builder, count=200000, scale=1, center=(0, 
             b *= v
 
             a = 1.0
-            buffer_builder.pos(x, y, z).col(r, g, b, a).siz(10000).end()
+            buffer_builder.pos(x, y, z).col(r, g, b, a).siz(20000).end()
 
-def generate_random_points(buffer_builder, count=200000, scale=10000):
+def generate_random_points(buffer_builder, count=100000, scale=30000):
     for _ in range(count):
             # 随机位置
         x = random.uniform(-5000, 5000)
@@ -56,7 +56,7 @@ def generate_random_points(buffer_builder, count=200000, scale=10000):
         g *= v
         b *= v
         a = 1.0
-        buffer_builder.pos(x, y, z).col(r, g, b, a).siz(scale).end()
+        buffer_builder.pos(x, y, z).col(r, g, b, a).siz(scale*random.random()).end()
 
 
 class TestObject(GameObject):

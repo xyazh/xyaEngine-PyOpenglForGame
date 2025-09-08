@@ -188,6 +188,12 @@ class MSAAFrameBuffer:
             glBindTexture(GL_TEXTURE_2D, self.texture_id)
             self.render_global.using_shader.uniformTex(uint)
 
+    def getTexture(self) -> int:
+        if self.samples > 1:
+            return self.resolve_texture
+        else:
+            return self.texture_id
+
     def unBindTexture():
         glBindTexture(GL_TEXTURE_2D, 0)
 

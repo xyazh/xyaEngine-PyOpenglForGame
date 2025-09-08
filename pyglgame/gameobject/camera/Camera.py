@@ -4,6 +4,8 @@ from ...render.MSAAFrameBuffer import MSAAFrameBuffer
 from ...render.RenderBuffer import RenderBuffer
 from ...render.BufferBuilder import *
 from ...RenderGlobal import RenderGlobal
+from ...filler.Bloom import Bloom
+from ...render.TextureStorage2D import TextureStorage2D
 from OpenGL.GL import *
 
 
@@ -19,10 +21,6 @@ class Camera(GameObject):
         self.bloom_ping: MSAAFrameBuffer = None
         self.bloom_pong: MSAAFrameBuffer = None
         self.bloom: MSAAFrameBuffer = None
-        self.w: int = 960
-        self.h: int = 540
-        self.w1: int = 96
-        self.h1: int = 54
         self.render_global: RenderGlobal = None
 
     def start(self):
@@ -31,18 +29,11 @@ class Camera(GameObject):
         self.size = RenderGlobal.instance.window.size
         self.createFrameBuffer()
         self.render_buffer = RenderBuffer.getWindownRenderBuffer()
-
+        self.bloom:Bloom = None
+        self.bloomed_texture: TextureStorage2D = None
         if self.use_bloom:
-            if self.bloom_ping is None:
-                self.bloom_ping = MSAAFrameBuffer(
-                    self.w, self.h, param=GL_LINEAR, samples=8)
-            if self.bloom_pong is None:
-                self.bloom_pong = MSAAFrameBuffer(
-                    self.w1, self.h1, param=GL_LINEAR)
-            if self.bloom is None:
-                fb = self.frame_buffer
-                self.bloom = MSAAFrameBuffer(
-                    fb.width, fb.height, fb.use_depth, fb.param, samples=fb.samples)
+            self.bloom = Bloom(self.size.w, self.size.h)
+            self.bloom.sefTexture(self.frame_buffer.getTexture())
 
     def setProjection(self, m: MBase):
         self.m = m
@@ -62,44 +53,16 @@ class Camera(GameObject):
         self.frame_buffer.drawEnd()
         if not self.use_bloom:
             return
-        self.copyOrigiral()
-        self.getHDRPix()
-        self.pingpong()
-        self.mixBloom()
+        self.bloomed_texture = self.bloom.bloom()
+        
 
-    def copyOrigiral(self):
-        self.bloom.drawStart()
-        self.frame_buffer.drawToWindow(4)
-        self.bloom.drawEnd()
-
-    def getHDRPix(self):
-        self.bloom_ping.drawStart()
-        self.frame_buffer.drawToWindow(2)
-        self.bloom_ping.drawEnd()
-
-    def pingpong(self):
-        ping_or_pong = 1
-        for _ in range(4):
-            ping_or_pong ^= 1
-            if ping_or_pong == 1:
-                self.bloom_ping.drawStart()
-                self.bloom_pong.drawToWindow(3)
-                self.bloom_ping.drawEnd()
-            else:
-                self.bloom_pong.drawStart()
-                self.bloom_ping.drawToWindow(3)
-                self.bloom_pong.drawEnd()
-
-    def mixBloom(self):
-        self.bloom_ping.bindTexture(GL_TEXTURE1)
-        self.bloom.bindTexture(GL_TEXTURE0)
-        self.frame_buffer.drawStart()
-        self.bloom.drawToWindow(5)
-        self.frame_buffer.drawEnd()
-
-    def draw(self):
-        self.frame_buffer.drawToWindow()
-
+    def draw(self, fuc: int = 1):
+        if self.use_bloom:
+            self.bloomed_texture.bind()
+        else:
+            self.frame_buffer.bindTexture()
+        RenderGlobal.instance.using_shader.uniform1i("fuc", fuc)
+        self.render_buffer.draw(False)
     def windowCameraSet(self,
                         bottom_left: tuple[float, float, float],
                         bottom_right: tuple[float, float, float],
@@ -115,9 +78,12 @@ class Camera(GameObject):
         self.buf_builder.pos(*top_left).tex(0, 1).end()
 
     def windowCameraDraw(self):
-        self.frame_buffer.bindTexture()
+        if self.use_bloom:
+            self.bloomed_texture.bind()
+        else:
+            self.frame_buffer.bindTexture()
         RenderGlobal.instance.using_shader.uniform1i("fuc", 1)
-        self.render_buffer.draw()
+        self.render_buffer.draw(False)
 
     def switch(self, state: bool = None):
         rg = RenderGlobal.instance
@@ -131,19 +97,9 @@ class Camera(GameObject):
         else:
             rg.removeWindowCamera(self)
 
-    def useBloom(self, active: bool = True, w=1024, h=576, w1=480, h1=270):
+    def useBloom(self, active: bool = True):
         self.use_bloom = active
-        self.w = w
-        self.h = h
-        self.w1 = w1
-        self.h1 = h1
         if not active or not self.started:
             return
-        if self.bloom_ping is None:
-            self.bloom_ping = MSAAFrameBuffer(w, h, param=GL_LINEAR)
-        if self.bloom_pong is None:
-            self.bloom_pong = MSAAFrameBuffer(w1, h1, param=GL_LINEAR)
-        if self.bloom is None:
-            fb = self.frame_buffer
-            self.bloom = MSAAFrameBuffer(
-                fb.width, fb.height, fb.use_depth, fb.param, samples=fb.samples)
+        self.bloom = Bloom(self.size.w, self.size.h)
+        self.bloom.sefTexture(self.frame_buffer.getTexture())

@@ -30,12 +30,12 @@ class TestObject(GameObject):
         return super().render(dt, fps)
 
     def renderPlain(self, buffer_builder: BufferBuilder):
-        buffer_builder.pos(-1000, -5, +1000).col(0.7, 0.7, 0.7, 1).end()
-        buffer_builder.pos(+1000, -5, +1000).col(0.7, 0.7, 0.7, 1).end()
-        buffer_builder.pos(-1000, -5, -1000).col(0.7, 0.7, 0.7, 1).end()
-        buffer_builder.pos(+1000, -5, +1000).col(0.7, 0.7, 0.7, 1).end()
-        buffer_builder.pos(+1000, -5, -1000).col(0.7, 0.7, 0.7, 1).end()
-        buffer_builder.pos(-1000, -5, -1000).col(0.7, 0.7, 0.7, 1).end()
+        buffer_builder.pos(-100, -5, +100).col(0.7, 0.7, 0.7, 1).end()
+        buffer_builder.pos(+100, -5, +100).col(0.7, 0.7, 0.7, 1).end()
+        buffer_builder.pos(-100, -5, -100).col(0.7, 0.7, 0.7, 1).end()
+        buffer_builder.pos(+100, -5, +100).col(0.7, 0.7, 0.7, 1).end()
+        buffer_builder.pos(+100, -5, -100).col(0.7, 0.7, 0.7, 1).end()
+        buffer_builder.pos(-100, -5, -100).col(0.7, 0.7, 0.7, 1).end()
 
     def renderCube(self, buffer_builder: BufferBuilder):
         # 平移量
@@ -144,6 +144,6 @@ m = MPerspective()
 m.updateAspectFromSize(960, 540)
 camera.setProjection(m)
 camera.switch()
-#camera.useBloom()
+camera.useBloom()
 
 app.start()
