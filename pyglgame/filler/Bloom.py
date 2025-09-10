@@ -11,10 +11,12 @@ class Bloom:
             "./res/shader/computeBloom")
         self.w = w
         self.h = h
-        self.pingpong_tex1 = TextureStorage2D(int(w/2), int(h/2), unit=1)
-        self.pingpong_tex2 = TextureStorage2D(int(w/2), int(h/2), unit=2)
-        self.down_sample_tex1 = TextureStorage2D(int(w/4), int(h/4), unit=3)
-        self.down_sample_tex2 = TextureStorage2D(int(w/4), int(h/4), unit=4)
+        self.level1 = 2
+        self.level2 = 4
+        self.pingpong_tex1 = TextureStorage2D(int(w/self.level1), int(h/self.level1), unit=1)
+        self.pingpong_tex2 = TextureStorage2D(int(w/self.level1), int(h/self.level1), unit=2)
+        self.down_sample_tex1 = TextureStorage2D(int(w/self.level2), int(h/self.level2), unit=3)
+        self.down_sample_tex2 = TextureStorage2D(int(w/self.level2), int(h/self.level2), unit=4)
         self.out_tex = TextureStorage2D(int(w), int(h), unit=5)
         self.ldr_tex = TextureStorage2D(int(w), int(h), unit=6)
 
@@ -52,7 +54,7 @@ class Bloom:
         self.compute_shader.dispatch(
             self.down_sample_tex1.group_x, self.down_sample_tex1.group_y, 1)
         self.compute_shader.memoryBarrier()
-        for _ in range(10):
+        for _ in range(5):
             # 高斯
             self.compute_shader.uniform1i("mode", 4)
             self.compute_shader.dispatch(
@@ -69,7 +71,7 @@ class Bloom:
         self.compute_shader.dispatch(
             self.pingpong_tex1.group_x, self.pingpong_tex1.group_y, 1)
         self.compute_shader.memoryBarrier()
-        for _ in range(10):
+        for _ in range(2):
             # 高斯
             self.compute_shader.uniform1i("mode", 2)
             self.compute_shader.dispatch(
