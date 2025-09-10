@@ -64,15 +64,17 @@ class TestObject(GameObject):
             (4, 5, 1, 0),  # Bottom
         ]
 
+        l = 2
+
         for a, b, c, d in faces:
             # 三角形1
-            buffer_builder.pos(*vertices[a]).col(1, 1, 0, 1).end()
-            buffer_builder.pos(*vertices[b]).col(1, 1, 0, 1).end()
-            buffer_builder.pos(*vertices[c]).col(1, 1, 0, 1).end()
+            buffer_builder.pos(*vertices[a]).col(1*l, 1*l, 0*l, 1).end()
+            buffer_builder.pos(*vertices[b]).col(1*l, 1*l, 0*l, 1).end()
+            buffer_builder.pos(*vertices[c]).col(1*l, 1*l, 0*l, 1).end()
             # 三角形2
-            buffer_builder.pos(*vertices[a]).col(1, 1, 0, 1).end()
-            buffer_builder.pos(*vertices[c]).col(1, 1, 0, 1).end()
-            buffer_builder.pos(*vertices[d]).col(1, 1, 0, 1).end()
+            buffer_builder.pos(*vertices[a]).col(1*l, 1*l, 0*l, 1).end()
+            buffer_builder.pos(*vertices[c]).col(1*l, 1*l, 0*l, 1).end()
+            buffer_builder.pos(*vertices[d]).col(1*l, 1*l, 0*l, 1).end()
 
 
 class TestCamera(Camera):

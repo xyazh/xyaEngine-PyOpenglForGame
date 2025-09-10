@@ -28,7 +28,7 @@ def generate_random_triangles(buffer_builder, count=200000, scale=1, center=(0, 
             # 随机颜色
 
             # 随机色调（0~1），饱和度高，亮度高
-            h = random.random()*5+1
+            """h = random.random()*5+1
             s = 1.0
             v = random.uniform(3.0, 10.0)  # HDR亮度
 
@@ -36,7 +36,11 @@ def generate_random_triangles(buffer_builder, count=200000, scale=1, center=(0, 
             r *= v
             g *= v
             b *= v
+            """
 
+            r = 0.3
+            g = 0.0
+            b = 0.0
             a = 1.0
             buffer_builder.pos(x, y, z).col(r, g, b, a).siz(20000).end()
 
@@ -48,13 +52,19 @@ def generate_random_points(buffer_builder, count=100000, scale=30000):
         z = random.uniform(20, 10000)
         # 随机颜色
         # 随机色调（0~1），饱和度高，亮度高
-        h = random.random()*5+1
+        # 随机色调（0~1），饱和度高，亮度高
+        """h = random.random()*5+1
         s = 1.0
         v = random.uniform(3.0, 10.0)  # HDR亮度
         r, g, b = colorsys.hsv_to_rgb(h, s, 1.0)
         r *= v
         g *= v
         b *= v
+        """
+        l = 4
+        r = random.random()*l
+        g = random.random()*l
+        b = random.random()*l
         a = 1.0
         buffer_builder.pos(x, y, z).col(r, g, b, a).siz(scale*random.random()).end()
 

@@ -16,6 +16,15 @@ class Bloom:
         self.down_sample_tex1 = TextureStorage2D(int(w/4), int(h/4), unit=3)
         self.down_sample_tex2 = TextureStorage2D(int(w/4), int(h/4), unit=4)
         self.out_tex = TextureStorage2D(int(w), int(h), unit=5)
+        self.ldr_tex = TextureStorage2D(int(w), int(h), unit=6)
+
+        self.down_sample_tex1.useTextureParameteri()
+        self.pingpong_tex1.useTextureParameteri()
+        self.out_tex.useTextureParameteri()
+        self.ldr_tex.useTextureParameteri()
+        
+
+
 
     def sefTexture(self, texture: TextureBase | int) -> None:
         if isinstance(texture, TextureBase):
@@ -31,6 +40,13 @@ class Bloom:
         
         # 2. 运行 compute shader
         self.compute_shader.use()
+
+        #提取
+        self.compute_shader.uniform1i("mode", 7)
+        self.compute_shader.dispatch(
+            self.ldr_tex.group_x, self.ldr_tex.group_y, 1)
+        self.compute_shader.memoryBarrier()
+
         # 下采样
         self.compute_shader.uniform1i("mode", 0)
         self.compute_shader.dispatch(

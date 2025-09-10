@@ -8,6 +8,7 @@ layout (binding = 2, rgba32f) uniform image2D pingpongImage2;
 layout (binding = 3, rgba32f) uniform image2D downImage1;
 layout (binding = 4, rgba32f) uniform image2D downImage2;
 layout (binding = 5, rgba32f) uniform image2D outImage;
+layout (binding = 6, rgba32f) uniform image2D ldrImage;
 
 uniform int mode;
 uniform ivec2 p2Size;
@@ -18,6 +19,24 @@ const float weights[6] = float[6](
     0.16397, 0.15136, 0.11906, 0.07981, 0.04559, 0.02219
 );
 
+vec4 getHdr(vec4 color) {
+    float m = max(color.r, max(color.g, color.b));
+    if (m <= 1.0) {
+        return vec4(0);
+    }
+    return color;
+}
+
+vec4 getLdr(vec4 color) {
+    float m = max(color.r, max(color.g, color.b));
+    if (m <= 1.0) {
+        return color;
+    }
+    float alpha = color.a;
+    vec3 rgb = color.rgb;
+    rgb /= m;
+    return vec4(rgb, 1.0);
+}
 
 void main() {
     ivec2 gid = ivec2(gl_GlobalInvocationID.xy);
@@ -45,7 +64,7 @@ void main() {
         int count = 0;
         for (int i = 0; i < 5; i++) {
             ivec2 pos = clamp(inPos + offsets[i], ivec2(0), inSize - ivec2(1));
-            sum += imageLoad(inputImage, pos);
+            sum += getHdr(imageLoad(inputImage, pos));
             count++;
         }
         imageStore(downImage1, gid, sum / float(count));
@@ -129,7 +148,7 @@ void main() {
         if (gid.x >= outSize.x || gid.y >= outSize.y) return;
         // 计算在 pingpongImage1 中的浮点坐标
         vec2 uv = vec2(gid) / vec2(outSize);          // [0,1] 范围
-        vec2 pingCoord = uv * vec2(p1Size) - 0.5;
+        vec2 pingCoord = uv * vec2(p1Size - 0.5);
         ivec2 i0 = ivec2(floor(pingCoord));
         ivec2 i1 = i0 + ivec2(1, 0);
         ivec2 i2 = i0 + ivec2(0, 1);
@@ -146,11 +165,11 @@ void main() {
         vec4 c01 = imageLoad(pingpongImage1, i2);
         vec4 c11 = imageLoad(pingpongImage1, i3);
         vec4 pingColor = mix(mix(c00, c10, f.x), mix(c01, c11, f.x), f.y);
-        // 读取 inputImage
-        ivec2 inPos = clamp(gid, ivec2(0), inSize - 1);
-        vec4 inputColor = imageLoad(inputImage, inPos);
+        vec4 inputColor = imageLoad(ldrImage, gid);
         // 合并方式示例：简单相加
-        vec3 outColor = (pingColor.rgb + inputColor.rgb);
+        vec3 outColor = pingColor.rgb + inputColor.rgb;
         imageStore(outImage, gid, vec4(outColor,1.0));
+    }else if (mode == 7) { 
+        imageStore(ldrImage, gid, getLdr(imageLoad(inputImage, gid)));
     }
 }

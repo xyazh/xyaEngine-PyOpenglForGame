@@ -1,5 +1,6 @@
 from OpenGL.GL import *
 from .TextureBase import TextureBase
+import math
 
 
 class TextureStorage2D(TextureBase):
@@ -12,8 +13,13 @@ class TextureStorage2D(TextureBase):
         glBindTexture(GL_TEXTURE_2D, 0)
         self.w = w
         self.h = h
-        self.group_x = int((w + 15) // 16)
-        self.group_y = int((h + 15) // 16)
+        self.group_x = math.ceil(w / 16)
+        self.group_y = math.ceil(h / 16)
+
+    def useTextureParameteri(self,filter = GL_LINEAR):
+        glBindTexture(GL_TEXTURE_2D,self.id)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter)
 
 
     def bind(self, unit=GL_TEXTURE0):
