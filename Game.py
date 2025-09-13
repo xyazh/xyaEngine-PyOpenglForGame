@@ -46,12 +46,12 @@ def generate_random_triangles(buffer_builder, count=20000, scale=1, center=(0, 0
             a = 1.0
             buffer_builder.pos(x, y, z).col(r, g, b, a).siz(20000).end()
 
-def generate_random_points(buffer_builder, count=10000, scale=30000):
+def generate_random_points(buffer_builder, count=100000, scale=60):
     for _ in range(count):
             # 随机位置
-        x = random.uniform(-5000, 5000)
-        y = random.uniform(-5000, 5000)
-        z = random.uniform(20, 10000)
+        x = random.gauss(0, 20)
+        y = random.gauss(0, 20)
+        z = random.gauss(0, 20)
         # 随机颜色
         # 随机色调（0~1），饱和度高，亮度高
         # 随机色调（0~1），饱和度高，亮度高
@@ -63,12 +63,12 @@ def generate_random_points(buffer_builder, count=10000, scale=30000):
         g *= v
         b *= v
         """
-        l = 8
+        l = 8 * random.random() + 8
         r = random.random()*l
         g = random.random()*l
         b = random.random()*l
         a = 1.0
-        buffer_builder.pos(x, y, z).col(r, g, b, a).siz(scale*random.random()).end()
+        buffer_builder.pos(x, y, z).col(r, g, b, a).siz(scale).end()
 
 
 class TestObject(GameObject):
@@ -85,14 +85,10 @@ class TestObject(GameObject):
         self.render_buffer.buffer_builder.buffer.clear()
 
     def render(self, dt, fps):
-        RenderGlobal.instance.setPosition(0, 0, 10000)
-        RenderGlobal.instance.updateGlobalUniforms()
-        self.render_buffer.draw(False)
         RenderGlobal.instance.setPosition(0, 0, 0)
         RenderGlobal.instance.updateGlobalUniforms()
         self.render_buffer.draw(False)
         
-
         print(fps)
         return super().render(dt, fps)
 
@@ -122,7 +118,7 @@ class TestCamera(Camera):
         move_x, move_y, move_z = 0, 0, 0
 
         window = self.render_global.window
-        speed = 1000 * dt
+        speed = 10 * dt
         if window.getKey("w") or window.getKey("W"):
             move_x += self.forward.x * speed
             move_y += self.forward.y * speed

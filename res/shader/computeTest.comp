@@ -1,0 +1,46 @@
+#version 430
+
+layout (local_size_x = 16, local_size_y = 16) in;
+
+layout (binding = 0) uniform sampler2D inputTex;
+layout (binding = 1, rgba32f) uniform image2D dataImage;
+layout (binding = 2, rgba32f) uniform image2D outputImage;
+
+uniform int mode;
+
+const int TO_IMAGE = 0;
+const int SAMPLE_X = 1;
+const int SAMPLE_Y = 2;
+
+const int level = 4;
+
+const int RADIUS1 = 5;
+const float weights1[6] = float[6](
+0.16397, 0.15136, 0.11906, 0.07981, 0.04559, 0.02219
+);
+
+void main() {
+    ivec2 gid = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 dataSize = imageSize(dataImage);
+    ivec2 downSize = dataSize / level;
+
+    if (mode == TO_IMAGE) {
+        ivec2 pos = (gid % downSize) * level;
+        ivec2 offset = gid / downSize;
+        vec2 uv = vec2(pos + offset) / vec2(dataSize);
+        imageStore(dataImage, gid, texture(inputTex, uv));
+    }else if (mode == SAMPLE_X) {
+        vec4 sum = vec4(0.0);
+        for(int i = -RADIUS1; i <= RADIUS1; i++){
+            int weights = weights1[abs(i)];
+            ivec2 pos = gid + ivec2(i, 0);
+            ivec2 offset = gid / downSize;
+        }
+    }else if (mode == SAMPLE_Y) {
+        vec4 sum = vec4(0.0);
+        for(int i = -RADIUS1; i <= RADIUS1; i++){
+            int weights = weights1[abs(i)];
+            ivec2 pos = gid + ivec2(0, i);
+        }
+    }
+}

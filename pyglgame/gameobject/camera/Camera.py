@@ -22,6 +22,8 @@ class Camera(GameObject):
         self.bloom_pong: MSAAFrameBuffer = None
         self.bloom: MSAAFrameBuffer = None
         self.render_global: RenderGlobal = None
+        self.__level1 = 2
+        self.__level2 = 4
 
     def start(self):
         super().start()
@@ -29,10 +31,11 @@ class Camera(GameObject):
         self.size = RenderGlobal.instance.window.size
         self.createFrameBuffer()
         self.render_buffer = RenderBuffer.getWindownRenderBuffer()
-        self.bloom:Bloom = None
+        self.bloom: Bloom = None
         self.bloomed_texture: TextureStorage2D = None
         if self.use_bloom:
-            self.bloom = Bloom(self.size.w, self.size.h)
+            self.bloom = Bloom(self.size.w, self.size.h,
+                               self.__level1, self.__level2)
             self.bloom.sefTexture(self.frame_buffer.getTexture())
 
     def setProjection(self, m: MBase):
@@ -54,7 +57,6 @@ class Camera(GameObject):
         if not self.use_bloom:
             return
         self.bloomed_texture = self.bloom.bloom()
-        
 
     def draw(self, fuc: int = 1):
         if self.use_bloom:
@@ -63,6 +65,7 @@ class Camera(GameObject):
             self.frame_buffer.bindTexture()
         RenderGlobal.instance.using_shader.uniform1i("fuc", fuc)
         self.render_buffer.draw(False)
+
     def windowCameraSet(self,
                         bottom_left: tuple[float, float, float],
                         bottom_right: tuple[float, float, float],
@@ -97,9 +100,12 @@ class Camera(GameObject):
         else:
             rg.removeWindowCamera(self)
 
-    def useBloom(self, active: bool = True):
+    def useBloom(self, active: bool = True, level1: float = 2, level2: float = 4):
         self.use_bloom = active
+        self.__level1 = level1
+        self.__level2 = level2
         if not active or not self.started:
             return
-        self.bloom = Bloom(self.size.w, self.size.h)
+        self.bloom = Bloom(self.size.w, self.size.h,
+                           level1=level1, level2=level2)
         self.bloom.sefTexture(self.frame_buffer.getTexture())

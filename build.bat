@@ -1,1 +1,1 @@
-nuitka --standalone --output-dir=./dist --lto=yes ./game.py
+nuitka --standalone --output-dir=./dist --lto=yes ./Game.py

@@ -26,7 +26,8 @@ class RenderGlobal:
         self.app: "App" = app
         self.window: "BaseWindow" = window
         self.bg: Color = Color(0, 0, 0)
-        self.using_shader = None
+        self.using_shader:"Shader" = None
+        self.bloom_shader:"Shader" = None
         self.using_layer = RenderLayer()
         self.layers: dict[object, RenderLayer] = {0: self.using_layer}
         self.cameras: set[Camera] = set()
@@ -39,7 +40,7 @@ class RenderGlobal:
         self._model = glm.mat4(1.0)
 
     def __init__(self, *arg,  **kw) -> None:
-        self.using_shader: "Shader" = None
+        pass
 
     def start(self):
         for layer in self.layers.values():

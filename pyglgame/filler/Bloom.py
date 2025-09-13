@@ -6,13 +6,12 @@ from OpenGL.GL import *
 
 
 class Bloom:
-    def __init__(self, w: int, h: int):
-        self.compute_shader = ShaderManager.loadComputeShader(
-            "./res/shader/computeBloom")
+    def __init__(self, w: int, h: int,level1: float=2, level2: float=4):
+        self.compute_shader = RenderGlobal.instance.bloom_shader
         self.w = w
         self.h = h
-        self.level1 = 2
-        self.level2 = 4
+        self.level1 = level1
+        self.level2 = level2
         self.pingpong_tex1 = TextureStorage2D(int(w/self.level1), int(h/self.level1), unit=1)
         self.pingpong_tex2 = TextureStorage2D(int(w/self.level1), int(h/self.level1), unit=2)
         self.down_sample_tex1 = TextureStorage2D(int(w/self.level2), int(h/self.level2), unit=3)
@@ -71,7 +70,7 @@ class Bloom:
         self.compute_shader.dispatch(
             self.pingpong_tex1.group_x, self.pingpong_tex1.group_y, 1)
         self.compute_shader.memoryBarrier()
-        for _ in range(2):
+        for _ in range(3):
             # 高斯
             self.compute_shader.uniform1i("mode", 2)
             self.compute_shader.dispatch(

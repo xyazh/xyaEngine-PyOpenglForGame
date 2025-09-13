@@ -15,6 +15,8 @@ class GameMainLoop:
 
     def start(self):
         self.render_global = RenderGlobal.instance
+        self.render_global.bloom_shader = ShaderManager.loadComputeShader(
+            "./res/shader/computeBloom")
         shader = ShaderManager.loadShader("./res/shader/dis")
         shader.use()
         self.window = self.render_global.window

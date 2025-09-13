@@ -15,13 +15,13 @@ uniform ivec2 p2Size;
 
 // 高斯半径和卷积核
 const int RADIUS1 = 5;
-const float weights1[11] = float[11](
-0.02219, 0.04559, 0.07981, 0.11906, 0.15136, 0.16397, 0.15136, 0.11906, 0.07981, 0.04559, 0.02219
+const float weights1[6] = float[6](
+0.16397, 0.15136, 0.11906, 0.07981, 0.04559, 0.02219
 );
 
 const int RADIUS2 = 10;
-const float weights2[21] = float[21](
-0.01119, 0.01637, 0.02300, 0.03105, 0.04026, 0.05017, 0.06007, 0.06909, 0.07636, 0.08108, 0.08272, 0.08108, 0.07636, 0.06909, 0.06007, 0.05017, 0.04026, 0.03105, 0.02300, 0.01637, 0.01119
+const float weights2[11] = float[11](
+0.08272, 0.08108, 0.07636, 0.06909, 0.06007, 0.05017, 0.04026, 0.03105, 0.02300, 0.01637, 0.01119
 );
 
 vec4 getHdr(vec4 color) {
@@ -105,10 +105,12 @@ void main() {
         float totalWeight = 0.0;
         for (int i = -RADIUS1; i <= RADIUS1; i++){
             ivec2 offset = gid + ivec2(i, 0);
-            ivec2 pos = clamp(offset, ivec2(0), p1Size - ivec2(1));
             float w = weights1[abs(i)];
-            blurColor += imageLoad(pingpongImage1, pos) * w;
             totalWeight += w;
+            if (offset.y > p1Size.y || offset.x > p1Size.x || offset.y <= 0 || offset.x <= 0){
+                continue;
+            }
+            blurColor += imageLoad(pingpongImage1, offset) * w;
         }
         blurColor /= totalWeight;
         imageStore(pingpongImage2, gid, blurColor);
@@ -117,10 +119,12 @@ void main() {
         float totalWeight = 0.0;
         for (int i = -RADIUS1; i <= RADIUS1; i++){
             ivec2 offset = gid + ivec2(0, i);
-            ivec2 pos = clamp(offset, ivec2(0), p2Size - ivec2(1));
             float w = weights1[abs(i)];
-            blurColor += imageLoad(pingpongImage2, pos) * w;
             totalWeight += w;
+            if (offset.y > p2Size.y || offset.x > p2Size.x || offset.y <= 0 || offset.x <= 0){
+                continue;
+            }
+            blurColor += imageLoad(pingpongImage2, offset) * w;
         }
         blurColor /= totalWeight;
         imageStore(pingpongImage1, gid, blurColor);
@@ -129,10 +133,12 @@ void main() {
         float totalWeight = 0.0;
         for (int i = -RADIUS2; i <= RADIUS2; i++){
             ivec2 offset = gid + ivec2(i, 0);
-            ivec2 pos = clamp(offset, ivec2(0), downSize1 - ivec2(1));
             float w = weights2[abs(i)];
-            blurColor += imageLoad(downImage1, pos) * w;
             totalWeight += w;
+            if (offset.y > downSize1.y || offset.x > downSize1.x || offset.y <= 0 || offset.x <= 0){
+                continue;
+            }
+            blurColor += imageLoad(downImage1, offset) * w;
         }
         blurColor /= totalWeight;
         imageStore(downImage2, gid, blurColor);
@@ -141,10 +147,12 @@ void main() {
         float totalWeight = 0.0;
         for (int i = -RADIUS2; i <= RADIUS2; i++){
             ivec2 offset = gid + ivec2(0, i);
-            ivec2 pos = clamp(offset, ivec2(0), downSize2 - ivec2(1));
             float w = weights2[abs(i)];
-            blurColor += imageLoad(downImage2, pos) * w;
             totalWeight += w;
+            if (offset.y > downSize2.y || offset.x > downSize2.x || offset.y <= 0 || offset.x <= 0){
+                continue;
+            }
+            blurColor += imageLoad(downImage2, offset) * w;
         }
         blurColor /= totalWeight;
         imageStore(downImage1, gid, blurColor);
