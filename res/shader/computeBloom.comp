@@ -107,7 +107,7 @@ void main() {
             ivec2 offset = gid + ivec2(i, 0);
             float w = weights1[abs(i)];
             totalWeight += w;
-            if (offset.y > p1Size.y || offset.x > p1Size.x || offset.y <= 0 || offset.x <= 0){
+            if (offset.x > p1Size.x || offset.x <= 0){
                 continue;
             }
             blurColor += imageLoad(pingpongImage1, offset) * w;
@@ -121,7 +121,7 @@ void main() {
             ivec2 offset = gid + ivec2(0, i);
             float w = weights1[abs(i)];
             totalWeight += w;
-            if (offset.y > p2Size.y || offset.x > p2Size.x || offset.y <= 0 || offset.x <= 0){
+            if (offset.y > p2Size.y || offset.y <= 0){
                 continue;
             }
             blurColor += imageLoad(pingpongImage2, offset) * w;
@@ -135,7 +135,7 @@ void main() {
             ivec2 offset = gid + ivec2(i, 0);
             float w = weights2[abs(i)];
             totalWeight += w;
-            if (offset.y > downSize1.y || offset.x > downSize1.x || offset.y <= 0 || offset.x <= 0){
+            if (offset.x > downSize1.x || offset.x <= 0){
                 continue;
             }
             blurColor += imageLoad(downImage1, offset) * w;
@@ -149,7 +149,7 @@ void main() {
             ivec2 offset = gid + ivec2(0, i);
             float w = weights2[abs(i)];
             totalWeight += w;
-            if (offset.y > downSize2.y || offset.x > downSize2.x || offset.y <= 0 || offset.x <= 0){
+            if (offset.y > downSize2.y  || offset.y <= 0){
                 continue;
             }
             blurColor += imageLoad(downImage2, offset) * w;

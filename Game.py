@@ -16,12 +16,12 @@ import colorsys
 
 def generate_random_triangles(buffer_builder, count=20000, scale=1, center=(0, 0, 0)):
     for _ in range(count):
-        cx, cy, cz = (random.uniform(-5000, 5000),
-                      random.uniform(-5000, 5000),
-                      random.uniform(20, 10000))
+        cx, cy, cz = (random.uniform(-5, 5),
+                      random.uniform(-5, 5),
+                      random.uniform(20, 10))
         # 每个三角形的三个顶点
         # 生成基础色温 (2000~15000K)
-        scale = random.random()*30+1
+        scale = (random.random()*30+1)/1000
         for _ in range(3):
             # 随机位置
             x = cx + random.uniform(-scale, scale)
@@ -30,7 +30,7 @@ def generate_random_triangles(buffer_builder, count=20000, scale=1, center=(0, 0
             # 随机颜色
 
             # 随机色调（0~1），饱和度高，亮度高
-            """h = random.random()*5+1
+            h = random.random()*5+1
             s = 1.0
             v = random.uniform(3.0, 10.0)  # HDR亮度
 
@@ -38,13 +38,9 @@ def generate_random_triangles(buffer_builder, count=20000, scale=1, center=(0, 0
             r *= v
             g *= v
             b *= v
-            """
 
-            r = 0.3
-            g = 0.0
-            b = 0.0
             a = 1.0
-            buffer_builder.pos(x, y, z).col(r, g, b, a).siz(20000).end()
+            buffer_builder.pos(x, y, z).col(r, g, b, a).end()
 
 def generate_random_points(buffer_builder, count=100000, scale=60):
     for _ in range(count):
@@ -77,8 +73,9 @@ class TestObject(GameObject):
 
     def start(self):
         render_buffer = RenderBuffer()
-        buffer_builder = render_buffer.createBuffer(GL_POINTS, POS | COL | SIZ)
+        #buffer_builder = render_buffer.createBuffer(GL_TRIANGLES, POS | COL)
         #generate_random_triangles(buffer_builder)
+        buffer_builder = render_buffer.createBuffer(GL_POINTS, POS | COL | SIZ)
         generate_random_points(buffer_builder)
         self.render_buffer = render_buffer
         self.render_buffer.build()

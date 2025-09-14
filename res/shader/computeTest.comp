@@ -11,8 +11,9 @@ uniform int mode;
 const int TO_IMAGE = 0;
 const int SAMPLE_X = 1;
 const int SAMPLE_Y = 2;
+const int GET_BACK = 3;
 
-const int level = 4;
+const int level = 16;
 
 const int RADIUS1 = 5;
 const float weights1[6] = float[6](
@@ -25,22 +26,54 @@ void main() {
     ivec2 downSize = dataSize / level;
 
     if (mode == TO_IMAGE) {
-        ivec2 pos = (gid % downSize) * level;
-        ivec2 offset = gid / downSize;
-        vec2 uv = vec2(pos + offset) / vec2(dataSize);
-        imageStore(dataImage, gid, texture(inputTex, uv));
+        ivec2 offsets[5] = ivec2[5](
+            ivec2(0, 0), 
+            ivec2(1, 0), 
+            ivec2(0, 1), 
+            ivec2(-1, 0),
+            ivec2(0, -1)
+        );
+        vec4 sum = vec4(0.0);
+        for(int i = 0; i < 5; i++){
+            ivec2 pos = (gid % downSize) * level + offsets[i];
+            ivec2 offset = gid / (downSize + 1);
+            vec2 uv = vec2(pos + offset + offsets[i]) / vec2(dataSize);
+            sum += texture(inputTex, uv);
+        }
+        imageStore(dataImage, gid, sum / 5.0);
     }else if (mode == SAMPLE_X) {
         vec4 sum = vec4(0.0);
+        float totalWeight = 0.0;
         for(int i = -RADIUS1; i <= RADIUS1; i++){
-            int weights = weights1[abs(i)];
             ivec2 pos = gid + ivec2(i, 0);
-            ivec2 offset = gid / downSize;
+            ivec2 rangeMin = gid / (downSize + 1) * downSize;
+            ivec2 rangeMax = rangeMin + downSize;
+            float weights = weights1[abs(i)];
+            totalWeight += weights;
+            if (pos.x >= rangeMin.x && pos.x < rangeMax.x){
+                sum += imageLoad(dataImage, pos) * weights;
+            }
         }
+        imageStore(dataImage, gid, sum / totalWeight);
     }else if (mode == SAMPLE_Y) {
         vec4 sum = vec4(0.0);
+        float totalWeight = 0.0;
         for(int i = -RADIUS1; i <= RADIUS1; i++){
-            int weights = weights1[abs(i)];
             ivec2 pos = gid + ivec2(0, i);
+            ivec2 rangeMin = gid / (downSize + 1) * downSize;
+            ivec2 rangeMax = rangeMin + downSize;
+            float weights = weights1[abs(i)];
+            totalWeight += weights;
+            if (pos.x >= rangeMin.x && pos.x < rangeMax.x){
+                sum += imageLoad(dataImage, pos) * weights;
+            }
         }
+        imageStore(dataImage, gid, sum / totalWeight);
+    }else if(mode == GET_BACK){ 
+        ivec2 blockIndex = gid / level;
+        ivec2 offset = gid % level;
+        ivec2 dataCoord = blockIndex + offset * (downSize + 1);
+        vec4 color = imageLoad(dataImage, dataCoord);
+        imageStore(outputImage, gid, color);
     }
 }
