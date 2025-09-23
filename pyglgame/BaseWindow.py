@@ -56,7 +56,11 @@ class BaseWindow:
         keyboard.hook(self._keyHook)
         self.game_loop.start()
         self.game_loop.run()
+        glutCloseFunc(self.onClose)
         glutMainLoop()
+        
+    def onClose(self) -> None:
+        print("Bye")
 
     def displayFunc(self) -> None:
         self.size_x = glutGet(GLUT_WINDOW_WIDTH)

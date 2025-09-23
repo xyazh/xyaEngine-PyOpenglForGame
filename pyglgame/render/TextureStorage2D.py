@@ -15,13 +15,18 @@ class TextureStorage2D(TextureBase):
         self.h = h
         self.group_x = math.ceil(w / 16)
         self.group_y = math.ceil(h / 16)
+        self.access = access
+        self.internal_format = internal_format
 
     def useTextureParameteri(self,filter = GL_LINEAR):
         glBindTexture(GL_TEXTURE_2D,self.id)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter)
 
-
+    def bindUnit(self, unit=0):
+        glBindTexture(GL_TEXTURE_2D, self.id)
+        glBindImageTexture(unit, self.id, 0, GL_FALSE,
+                           0, self.access, self.internal_format)
     def bind(self, unit=GL_TEXTURE0):
         glActiveTexture(unit)
         glBindTexture(GL_TEXTURE_2D, self.id)

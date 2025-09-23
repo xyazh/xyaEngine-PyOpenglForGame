@@ -34,6 +34,7 @@ class GameMainLoop:
         buf_builder.pos(-1, +1, 0).tex(0, 1).end()   # top left
 
     def doUpdate(self, dt: float, tps: float):
+        self.app.audio_player.update()
         self.render_global.updateLayer(dt, tps)
 
     def doRender(self, dt: float, fps: float):

@@ -2,10 +2,7 @@
 
 layout (local_size_x = 16, local_size_y = 16) in;
 
-layout (binding = 0, rgba32f) uniform image2D noise_1;
-layout (binding = 1, rgba32f) uniform image2D noise_2;
-layout (binding = 2, rgba32f) uniform image2D noise_3;
-layout (binding = 7, rgba32f) uniform image2D outputImage;
+layout (binding = 0, rgba32f) uniform image2D outputImage;
 
 uniform int mode;
 uniform vec3 time;
@@ -19,21 +16,21 @@ float hash3(vec3 p){
 // 3D 基础噪声函数
 float noise3(vec3 p){
     vec3 i = floor(p);
-    vec3 f = fract(p);
+    vec3 f1 = fract(p);
 
     float a = hash3(i);
     float b = hash3(i + vec3(1.0,0.0,0.0));
     float c = hash3(i + vec3(0.0,1.0,0.0));
     float d = hash3(i + vec3(1.0,1.0,0.0));
     float e = hash3(i + vec3(0.0,0.0,1.0));
-    float f1 = hash3(i + vec3(1.0,0.0,1.0));
+    float f = hash3(i + vec3(1.0,0.0,1.0));
     float g = hash3(i + vec3(0.0,1.0,1.0));
     float h = hash3(i + vec3(1.0,1.0,1.0));
 
-    vec3 u = f*f*(3.0-2.0*f); // 平滑插值
+    vec3 u = f1*f1*(3.0-2.0*f1); // 平滑插值
 
     float xy0 = mix(a, b, u.x) + (c - a)* u.y*(1.0 - u.x) + (d - b)* u.x*u.y;
-    float xy1 = mix(e, f1, u.x) + (g - e)* u.y*(1.0 - u.x) + (h - f1)* u.x*u.y;
+    float xy1 = mix(e, f, u.x) + (g - e)* u.y*(1.0 - u.x) + (h - f)* u.x*u.y;
 
     return mix(xy0, xy1, u.z);
 }
@@ -60,7 +57,9 @@ void main() {
     float max_y = float(imageSize(outputImage).y);
 
     vec2 uv = vec2(gid) / vec2(size) * 5;
-    float n = fbm(vec3(uv, time.x / 10)); 
+    float n1 = fbm(vec3(uv, time.x)); 
+    float n2 = fbm(vec3(uv, time.y));
+    float n = n1 * n2;
     vec4 output_color = vec4(vec3(n),1);
 
     imageStore(outputImage, gid, output_color);
