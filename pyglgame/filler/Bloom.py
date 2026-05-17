@@ -18,7 +18,6 @@ class Bloom:
         self.down_sample_tex2 = TextureStorage2D(int(w/self.level2), int(h/self.level2), unit=4)
         self.out_tex = TextureStorage2D(int(w), int(h), unit=5)
         self.ldr_tex = TextureStorage2D(int(w), int(h), unit=6)
-
         self.down_sample_tex1.useTextureParameteri()
         self.pingpong_tex1.useTextureParameteri()
         self.out_tex.useTextureParameteri()
@@ -30,7 +29,6 @@ class Bloom:
     def sefTexture(self, texture: TextureBase | int) -> None:
         if isinstance(texture, TextureBase):
             texture = texture.id
-
         glBindTexture(GL_TEXTURE_2D, texture)
         glBindImageTexture(0, texture, 0, GL_FALSE, 0,
                            GL_READ_ONLY, GL_RGBA32F)
@@ -39,9 +37,13 @@ class Bloom:
         self.dis_shader = RenderGlobal.instance.using_shader
 
         
-        # 2. 运行 compute shader
         self.compute_shader.use()
-
+        self.pingpong_tex1.bindUnit(1)
+        self.pingpong_tex2.bindUnit(2)
+        self.down_sample_tex1.bindUnit(3)
+        self.down_sample_tex2.bindUnit(4)
+        self.out_tex.bindUnit(5)
+        self.ldr_tex.bindUnit(6)
         #提取
         self.compute_shader.uniform1i("mode", 7)
         self.compute_shader.dispatch(
@@ -85,6 +87,5 @@ class Bloom:
         self.compute_shader.dispatch(
             self.out_tex.group_x, self.out_tex.group_y, 1)
         self.compute_shader.memoryBarrier()
-        # 3. 加载用于显示的 shader
         self.dis_shader.use()
         return self.out_tex

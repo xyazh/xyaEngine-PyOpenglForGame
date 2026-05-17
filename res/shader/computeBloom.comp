@@ -13,7 +13,6 @@ layout (binding = 6, rgba32f) uniform image2D ldrImage;
 uniform int mode;
 uniform ivec2 p2Size;
 
-// 高斯半径和卷积核
 const int RADIUS1 = 5;
 const float weights1[6] = float[6](
 0.16397, 0.15136, 0.11906, 0.07981, 0.04559, 0.02219

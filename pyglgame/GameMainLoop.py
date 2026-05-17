@@ -17,21 +17,14 @@ class GameMainLoop:
         self.render_global = RenderGlobal.instance
         self.render_global.bloom_shader = ShaderManager.loadComputeShader(
             "./res/shader/computeBloom")
-        shader = ShaderManager.loadShader("./res/shader/dis")
-        shader.use()
+        self.render_global.fractal_noise_shader = ShaderManager.loadComputeShader(
+            "./res/shader/computeFractalNoise")
+        self.render_global.dis_shader = ShaderManager.loadShader(
+            "./res/shader/dis")
+        self.render_global.dis_shader.use()
         self.window = self.render_global.window
         self.app = self.render_global.app
         self.render_global.start()
-
-        self.render_global.render_buffer = RenderBuffer(GL_STATIC_DRAW)
-        buf_builder = self.render_global.render_buffer.createBuffer(
-            GL_TRIANGLES, POS | TEX)
-        buf_builder.pos(-1, -1, 0).tex(0, 0).end()  # bottom left
-        buf_builder.pos(+1, -1, 0).tex(1, 0).end()   # bottom right
-        buf_builder.pos(-1, +1, 0).tex(0, 1).end()   # top left
-        buf_builder.pos(+1, -1, 0).tex(1, 0).end()   # bottom right
-        buf_builder.pos(+1, +1, 0).tex(1, 1).end()    # top right
-        buf_builder.pos(-1, +1, 0).tex(0, 1).end()   # top left
 
     def doUpdate(self, dt: float, tps: float):
         self.app.audio_player.update()

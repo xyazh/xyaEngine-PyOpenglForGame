@@ -26,8 +26,10 @@ class RenderGlobal:
         self.app: "App" = app
         self.window: "BaseWindow" = window
         self.bg: Color = Color(0, 0, 0)
-        self.using_shader:"Shader" = None
-        self.bloom_shader:"Shader" = None
+        self.using_shader: "Shader" = None
+        self.dis_shader: "Shader" = None
+        self.bloom_shader: "Shader" = None
+        self.fractal_noise_shader: "Shader" = None
         self.using_layer = RenderLayer()
         self.layers: dict[object, RenderLayer] = {0: self.using_layer}
         self.cameras: set[Camera] = set()
