@@ -20,6 +20,7 @@ class TestObject(GameObject):
         render_buffer = RenderBuffer()
         self.render_buffer = render_buffer
         self.cube_light = 2
+        glDisable(GL_CULL_FACE)
 
     def render(self, dt, fps):
         buffer_builder = self.render_buffer.createBuffer(
@@ -68,12 +69,12 @@ class TestObject(GameObject):
         l =  self.cube_light
 
         for a, b, c, d in faces:
-            buffer_builder.pos(*vertices[a]).col(1*l, 0*l, 1*l, 1).end()
-            buffer_builder.pos(*vertices[b]).col(1*l, 0*l, 1*l, 1).end()
-            buffer_builder.pos(*vertices[c]).col(1*l, 0*l, 1*l, 1).end()
-            buffer_builder.pos(*vertices[a]).col(1*l, 0*l, 1*l, 1).end()
-            buffer_builder.pos(*vertices[c]).col(1*l, 0*l, 1*l, 1).end()
-            buffer_builder.pos(*vertices[d]).col(1*l, 0*l, 1*l, 1).end()
+            buffer_builder.pos(*vertices[a]).col(1, 1, 1, 0.5).end()
+            buffer_builder.pos(*vertices[b]).col(1, 0, 1, 0.5).end()
+            buffer_builder.pos(*vertices[c]).col(1, 0, 1, 0.5).end()
+            buffer_builder.pos(*vertices[a]).col(1, 1, 1, 0.5).end()
+            buffer_builder.pos(*vertices[c]).col(1, 0, 1, 0.5).end()
+            buffer_builder.pos(*vertices[d]).col(1, 0, 1, 0.5).end()
 
     def update(self, dt, tps):
         #self.cube_light += dt
@@ -149,6 +150,6 @@ m = MPerspective()
 m.updateAspectFromSize(960, 540)
 camera.setProjection(m)
 camera.switch()
-camera.useBloom()
+#camera.useBloom()
 
 app.start()

@@ -181,6 +181,8 @@ void main() {
         vec4 inputColor = imageLoad(ldrImage, gid);
         // 合并方式示例：简单相加
         vec3 outColor = pingColor.rgb + inputColor.rgb;
+        float dither = (fract(sin(dot(gl_GlobalInvocationID.xy ,vec2(12.9898,78.233))) * 43758.5453) - 0.5)/255.0;
+        outColor = outColor + dither;
         imageStore(outImage, gid, vec4(outColor,1.0));
     }else if (mode == 7) { 
         imageStore(ldrImage, gid, getLdr(imageLoad(inputImage, gid)));
