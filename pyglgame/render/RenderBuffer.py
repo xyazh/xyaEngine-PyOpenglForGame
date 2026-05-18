@@ -14,6 +14,7 @@ class RenderBuffer:
 
     def __init__(self, usage: int = GL_DYNAMIC_DRAW):
         self.vbo = -1
+        self.vao = -1
         self.usage = usage
         self.buffer_builder = None
         self.is_build = False
@@ -33,12 +34,19 @@ class RenderBuffer:
     def build(self, re_build: bool = True):
         if self.vbo == -1:
             self.vbo = glGenBuffers(1)
+        if self.vao == -1:
+            self.vao = glGenVertexArrays(1)
         elif not re_build:
             return
         vertices = self.buffer_builder.buffer
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         glBufferData(GL_ARRAY_BUFFER, len(vertices) * sizeof(c_float),
                      (c_float * len(vertices))(*vertices), self.usage)
+        glBindVertexArray(self.vao)
+        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
+        self.configureVertexAttributes()
+        glBindVertexArray(0)
+        glBindBuffer(GL_ARRAY_BUFFER, 0)
 
     def draw(self, re_build: bool = True):
         self.build(re_build)
@@ -46,7 +54,7 @@ class RenderBuffer:
         if shader is not None:
             shader.uniform1i("formatType", self.buffer_builder.format_type)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-        self.configureVertexAttributes()
+        glBindVertexArray(self.vao)
         glDrawArrays(self.buffer_builder.pri_type, 0, self.buffer_builder.size)
 
     def configureVertexAttributes(self):

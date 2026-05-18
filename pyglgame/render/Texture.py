@@ -71,3 +71,5 @@ class Texture(TextureBase):
         glBindTexture(GL_TEXTURE_2D, self.id)
         glBindImageTexture(uint, self.id, 0,
                            GL_FALSE, 0, GL_READ_ONLY, GL_RGBA32F)
+
+

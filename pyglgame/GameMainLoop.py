@@ -42,9 +42,6 @@ class GameMainLoop:
         # glFlush()
         glutSwapBuffers()
 
-    def updateLoop(self):
-        xyaTimerFunc(10, self.doUpdate)
-
     def renderLoop(self):
         current_time = glutGet(GLUT_ELAPSED_TIME) / 1000.0
         self.render_dt = current_time - self.render_last_time
@@ -61,5 +58,5 @@ class GameMainLoop:
             glutMainLoopEvent()  # 处理单个事件
             glutPostRedisplay()  # 请求重绘
             self.renderLoop()"""
-        self.updateLoop()
+        xyaTimerFunc(10, self.doUpdate)
         glutIdleFunc(self.renderLoop)

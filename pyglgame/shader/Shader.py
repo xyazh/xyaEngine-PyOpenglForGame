@@ -41,6 +41,8 @@ UINT_MAP = {
 
 
 class Shader:
+    loc_nams = {}
+
     def __init__(self, shader: int):
         self.shader: int = shader
 
@@ -112,7 +114,9 @@ class Shader:
         glUniform4f(loc, f, g, h, i)
 
     def getLoc(self, name: str):
-        return glGetUniformLocation(self.getShaderId(), name)
+        if name not in self.loc_nams:
+            self.loc_nams[name] = glGetUniformLocation(self.getShaderId(), name)
+        return self.loc_nams[name]
 
     def dispatch(self, x: int, y: int = 1, z: int = 1):
         """Dispatch compute shader."""
