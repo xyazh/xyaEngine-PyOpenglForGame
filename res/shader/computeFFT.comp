@@ -1,0 +1,171 @@
+#version 430
+
+layout(local_size_x = 16, local_size_y = 16) in;
+
+
+
+layout(binding = 1, rgba32f) uniform image2D srcR;
+layout(binding = 2, rgba32f) uniform image2D srcG;
+layout(binding = 3, rgba32f) uniform image2D srcB;
+layout(binding = 4, rgba32f) uniform image2D dstR;
+layout(binding = 5, rgba32f) uniform image2D dstG;
+layout(binding = 6, rgba32f) uniform image2D dstB;
+layout(binding = 7, rgba32f) uniform image2D outputImage;
+
+uniform sampler2D inputImage;
+uniform ivec2 imageSize;
+
+/*
+mode:
+0 = initialize
+1 = horizontal FFT
+2 = vertical FFT
+3 = output spectrum
+4 = output inverse image
+*/
+uniform int mode;
+/*
+0~9 for 1024
+*/
+uniform int fftStep;
+/*
+0 = FFT
+1 = IFFT
+*/
+uniform int inverseFFT;
+const float PI = 3.1415926535897932384626433832795;
+
+vec2 cMul(vec2 a, vec2 b){
+   return vec2(a.x*b.x - a.y*b.y,a.x*b.y + a.y*b.x);
+}
+
+vec2 cAdd(vec2 a, vec2 b){
+   return a + b;
+}
+
+vec2 cSub(vec2 a, vec2 b){
+   return a - b;
+}
+
+vec2 twiddle(float k, float N){
+   float fsign = inverseFFT == 0 ? -1.0 : 1.0;
+   float angle = fsign * 2.0 * PI * k / N;
+   return vec2(cos(angle), sin(angle));
+}
+
+uint reverseBits(uint x, uint bits){
+    uint r = 0u;
+    for(uint i=0u;i<bits;i++)
+    {
+        r <<= 1u;
+        r |= (x & 1u);
+        x >>= 1u;
+    }
+    return r;
+}
+
+void initFFT(){
+    ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if(any(greaterThanEqual(pos,imageSize)))
+        return;
+    uint rx = reverseBits(uint(pos.x),10u);
+    uint ry = reverseBits(uint(pos.y),10u);
+    vec2 uv = vec2(pos) / vec2(imageSize);
+    vec4 c = texture(inputImage, uv);
+    imageStore(srcR, ivec2(rx,ry), vec4(c.r, 0.0, 0.0, 1.0));
+    imageStore(srcG, ivec2(rx,ry), vec4(c.g, 0.0, 0.0, 1.0));
+    imageStore(srcB, ivec2(rx,ry), vec4(c.b ,0.0, 0.0, 1.0));
+}
+
+void fftPass(bool vertical){
+    ivec2 gid = ivec2(gl_GlobalInvocationID.xy);
+    int span = 1 << (fftStep + 1);
+    int fhalf = span >> 1;
+    int line = vertical ? gid.x : gid.y;
+    int butterfly = vertical ? gid.y : gid.x;
+    int total = vertical ? imageSize.y : imageSize.x;
+    if(butterfly >= total/2)
+        return;
+    int group = butterfly / fhalf;
+    int offset = butterfly % fhalf;
+    int a = group * span + offset;
+    int b = a + fhalf;
+    ivec2 pa = vertical ? ivec2(line,a) : ivec2(a,line);
+    ivec2 pb = vertical ? ivec2(line,b) : ivec2(b,line);
+    vec2 rA;
+    vec2 rB;
+    vec2 gA;
+    vec2 gB;
+    vec2 bA;
+    vec2 bB;
+    if(fftStep%2 == 0){
+        rA = imageLoad(srcR, pa).rg;
+        rB = imageLoad(srcR, pb).rg;
+        gA = imageLoad(srcG, pa).rg;
+        gB = imageLoad(srcG, pb).rg;
+        bA = imageLoad(srcB, pa).rg;
+        bB = imageLoad(srcB, pb).rg;
+    }else{
+        rA = imageLoad(dstR, pa).rg;
+        rB = imageLoad(dstR, pb).rg;
+        gA = imageLoad(dstG, pa).rg;
+        gB = imageLoad(dstG, pb).rg;
+        bA = imageLoad(dstB, pa).rg;
+        bB = imageLoad(dstB, pb).rg;
+    }
+    vec2 W = twiddle(float(offset), float(span));
+    vec2 rT = cMul(rB,W);
+    vec2 gT = cMul(gB,W);
+    vec2 bT = cMul(bB,W);
+    vec2 r0 = rA + rT;
+    vec2 r1 = rA - rT;
+    vec2 g0 = gA + gT;
+    vec2 g1 = gA - gT;
+    vec2 b0 = bA + bT;
+    vec2 b1 = bA - bT;
+    if(fftStep%2 == 0){
+        imageStore(srcR, pa, vec4(r0.x, r0.y, 0.0, 1.0));
+        imageStore(srcR, pb, vec4(r1.x, r1.y, 0.0, 1.0));
+        imageStore(srcG, pa, vec4(g0.x, g0.y, 0.0, 1.0));
+        imageStore(srcG, pb, vec4(g1.x, g1.y, 0.0, 1.0));
+        imageStore(srcB, pa, vec4(b0.x, b0.y, 0.0, 1.0));
+        imageStore(srcB, pb, vec4(b1.x, b1.y, 0.0, 1.0));
+    }else{
+        imageStore(dstR, pa, vec4(r0.x, r0.y, 0.0, 1.0));
+        imageStore(dstR, pb, vec4(r1.x, r1.y, 0.0, 1.0));
+        imageStore(dstG, pa, vec4(g0.x, g0.y, 0.0, 1.0));
+        imageStore(dstG, pb, vec4(g1.x, g1.y, 0.0, 1.0));
+        imageStore(dstB, pa, vec4(b0.x, b0.y, 0.0, 1.0));
+        imageStore(dstB, pb, vec4(b1.x, b1.y, 0.0, 1.0));
+    }
+}
+
+void outputImagePass()
+{
+    ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    pos = (pos + imageSize / 2) % imageSize;
+    float r = log(1.0 + length(imageLoad(srcR, pos).rg));
+    float g = log(1.0 + length(imageLoad(srcG, pos).rg));
+    float b = log(1.0 + length(imageLoad(srcB, pos).rg));
+    vec3 color = vec3(r,g,b);
+    imageStore(outputImage, pos, vec4(color,1.0));
+}
+
+void main(){
+    if(mode == 0)
+    {
+        initFFT();
+    }
+    else if(mode == 1)
+    {
+        fftPass(false);
+    }
+    else if(mode == 2)
+    {
+        fftPass(true);
+    }
+    else if(mode == 3)
+    {
+        outputImagePass();
+    }
+}

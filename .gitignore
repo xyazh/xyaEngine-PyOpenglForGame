@@ -4,3 +4,9 @@ temp*
 test*
 data
 dist
+res/img
+res/audio
+res/font
+res/movies
+res/save
+output.*

@@ -17,6 +17,7 @@ class TextureFractalNoise(TextureStorage2D):
         self.compute_shader = RenderGlobal.instance.fractal_noise_shader
 
     def render(self, dt, fps):
+        self.bindUnit(7)
         self.dis_shader = RenderGlobal.instance.using_shader
         self.compute_shader.use()
         self.compute_shader.uniform3f("u_time", *self.time)
@@ -29,4 +30,3 @@ class TextureFractalNoise(TextureStorage2D):
         self.compute_shader.memoryBarrier()
         self.dis_shader.use()
         self.time += glm.vec3(dt/10)
-        #self.offset += glm.vec2(dt/10)

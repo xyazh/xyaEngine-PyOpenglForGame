@@ -79,6 +79,30 @@ class AudioResource:
         audio_data = (wave * (2**15 - 1) * volume).astype(np.int16)
         return cls.fromNpData(audio_data, sample_rate=sample_rate, channels=channels, device=device)
 
+    @classmethod
+    def generateNaturalSine(cls, frequency=440, duration=1.0, volume=0.5, sample_rate=44100, channels=1, device: Device = None):
+        t = np.linspace(0, duration, int(sample_rate*duration), endpoint=False)
+        # 基波 + 高次谐波衰减
+        wave = np.sin(2*np.pi*frequency*t)        # 基波
+        wave /= np.max(np.abs(wave))
+        # 添加短暂击弦瞬态（白噪声，0.5%幅度）
+        noise_len = int(sample_rate*0.005)
+        noise = (np.random.rand(noise_len) - 0.5) * 0.01
+        wave[:noise_len] += noise
+        # ADSR 包络
+        fade_in = int(sample_rate * 0.01)
+        fade_out = int(sample_rate * 0.3)
+        # 限制最大长度
+        fade_in = min(fade_in, len(wave)//2)
+        fade_out = min(fade_out, len(wave)//2)
+
+        envelope = np.ones_like(wave)
+        envelope[:fade_in] = np.linspace(0, 1, fade_in)
+        envelope[-fade_out:] = np.linspace(1, 0, fade_out)
+        wave *= envelope
+        audio_data = (wave * (2**15 - 1) * volume).astype(np.int16)
+        return cls.fromNpData(audio_data, sample_rate=sample_rate, channels=channels, device=device)
+
     def setData(self, np_data):
         self.data = np_data
         alBufferData = self.openal.alBufferData

@@ -16,8 +16,8 @@ from pyglgame.gameobject.camera.m.MOrthographic import MOrthographic
 app = App()
 app.window.setWindownSize((1920, 1080))
 
-CHUNK_SIZE = 16
-CHUNK_LOAD_RADIUS = 16
+CHUNK_SIZE = 32
+CHUNK_LOAD_RADIUS = 8
 
 class Chunk:
     def __init__(self, x, y, z):
@@ -29,7 +29,7 @@ class Chunk:
         self.blocks = [[[1 for _ in range(CHUNK_SIZE)] for _ in range(
             CHUNK_SIZE)] for _ in range(CHUNK_SIZE)]
 
-        self.render_buffer = RenderBuffer()
+        self.render_buffer = RenderBuffer(GL_STATIC_DRAW)
         self.build()
 
     def setBlock(self, x, y, z, block_type: int):
@@ -179,6 +179,8 @@ class World(GameObject):
                             return
     
     def update(self, dt, tps):
+        while True:
+            pass
         return super().update(dt, tps)
     
     def setPlayer(self, game_object: GameObject):
