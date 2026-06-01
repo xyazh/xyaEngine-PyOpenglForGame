@@ -2,6 +2,8 @@ import numpy as np
 import wave
 import ctypes
 from .Device import Device
+from ..ResourceLocation import ResourceLocation
+from io import BytesIO
 
 
 class AudioResource:
@@ -26,8 +28,12 @@ class AudioResource:
             self.setData(data)
 
     @classmethod
-    def fromWav(cls, wav_path, device: Device = None) -> "AudioResource":
-        with wave.open(wav_path, "rb") as wf:
+    def fromWav(cls, wav:str|BytesIO|ResourceLocation, device: Device = None) -> "AudioResource":
+        if isinstance(wav, ResourceLocation):
+            wf = wave.open(wav.getIO(), "rb")
+        else:
+            wf = wave.open(wav, "rb")
+        with wf:
             channels = wf.getnchannels()
             sample_rate = wf.getframerate()
             frames = wf.readframes(wf.getnframes())

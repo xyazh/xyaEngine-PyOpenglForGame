@@ -13,36 +13,26 @@ class AnimationFrame(AnimationBase):
                  scale: tuple[float, float] = (1, 1),
                  vertical_first: bool = False):
         super().__init__(resourceLocation)
-
         image = Image(resourceLocation)
-
         self.rows = rows
         self.columns = columns
         self.vertical_first = vertical_first
-
         self.width = image.width // columns
         self.height = image.height // rows
-
         self.s_columns = 1.0 / columns
         self.s_rows = 1.0 / rows
-
         self.frame_count = min(frame_count, rows * columns)
-
         self.texture = image.getTexture()
         self.render_buffer = RenderBuffer()
-
         self.max_time = float(self.frame_count) if time <= 0 else time
         self.time = 0.0
-
         self.l = -self.width / 2 * scale[0]
         self.r = self.width / 2 * scale[0]
         self.t = self.height / 2 * scale[1]
         self.b = -self.height / 2 * scale[1]
-
         self.x = 0
         self.y = 0
         self.z = 0
-
         self.flip_x = False
         self.flip_y = False
 

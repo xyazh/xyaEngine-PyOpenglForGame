@@ -347,7 +347,7 @@ class TestObject(GameObject):
         self.render_buffer_notes = RenderBuffer()
         self.render_particles = RenderBuffer()
         self.light_strip = RenderBuffer()
-        # Player.app_instance.play(AudioResource.fromWav(r"D:\NEW\gal\【豪華版】神様ちゅ～ず！\特典\期間限定追加特典 OPテーマ\神様の言う通り.wav"))
+        Player.app_instance.play(AudioResource.fromWav(r"D:\NEW\gal\【豪華版】神様ちゅ～ず！\特典\期間限定追加特典 OPテーマ\神様の言う通り.wav"))
         self.star_tex = Image(ResourceLocation(
             r"c:\Users\33023\Desktop\112.png")).getTexture()
         self.render_buffer_line = RenderBuffer(GL_STATIC_DRAW)

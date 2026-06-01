@@ -1,6 +1,7 @@
 import sys
 import keyboard
 import traceback
+import locale
 from typing import TYPE_CHECKING
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -14,13 +15,12 @@ if TYPE_CHECKING:
 
 
 class BaseWindow:
-    def __init__(self, app: "App", title: str, size: tuple[float], position: tuple[float], full_screen: bool) -> None:
+    def __init__(self, app: "App", size: tuple[float], position: tuple[float], full_screen: bool) -> None:
         self.setWindownSize(size)
         self.app = app
         self.render_global = RenderGlobal(app=app, window=self)
         self.pos_x, self.pos_y = position
         self.full_screen: bool = full_screen
-        self.title: str = title
         self.initMouse()
         self.key_set: set = set()
         self.key_down_set: set = set()
@@ -32,11 +32,11 @@ class BaseWindow:
     def setFullScreen(self) -> None:
         self.full_screen = True
 
-    def run(self) -> None:
+    def run(self,title: str) -> None:
         glutInit(sys.argv)
         glutInitWindowPosition(self.pos_x, self.pos_y)
         glutInitWindowSize(self.size.w, self.size.h)
-        glutCreateWindow(self.title.encode())
+        glutCreateWindow(title.encode(locale.getpreferredencoding()))
         if self.full_screen:
             glutFullScreen()
         glutMouseFunc(self._mouseHit)
